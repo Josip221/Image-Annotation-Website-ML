@@ -24,8 +24,9 @@ function Button({ children, parentFunction }: ButtonProps) {
     parentFunction?.();
   };
 
+  //fix enter key press
   const handlePress = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (e.key === 'Enter') parentFunction?.();
+    //if (e.key === 'Enter') parentFunction?.();
   };
 
   return (
