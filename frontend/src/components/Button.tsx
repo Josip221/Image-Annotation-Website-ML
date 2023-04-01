@@ -6,7 +6,6 @@ const Wrapper = styled.div`
     all: unset;
     cursor: pointer;
     background-color: ${props => props.theme.colors.button};
-    border-radius: 10px;
     padding: 0.2em;
     &:hover {
       background-color: ${props => props.theme.colors.second};
