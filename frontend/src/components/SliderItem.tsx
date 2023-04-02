@@ -11,23 +11,34 @@ const Wrapper = styled.div`
     background-color: ${props => props.theme.colors.second};
   }
   .slider-item_active {
-    border: 2px red solid;
+    border: 4px red solid;
   }
 
   .slider-photo {
-    width: 100%;
-    object-fit: 'cover';
+    width: 200px;
+    height: 150px;
+    object-fit: 'contain';
   }
 `;
 
 interface SliderItemProps {
   active?: boolean;
   img: string;
+  index: number;
+  handleImageClick: (imageNumber: number) => void;
 }
 
-function SliderItem({ active = false, img }: SliderItemProps) {
+function SliderItem({
+  active = false,
+  img,
+  index,
+  handleImageClick,
+}: SliderItemProps) {
+  const handleClick = () => {
+    handleImageClick(index);
+  };
   return (
-    <Wrapper>
+    <Wrapper onClick={handleClick}>
       <div className={`slider-item ${active && 'slider-item_active'}`}>
         <img className="slider-photo" alt="idk" src={img} />
       </div>
