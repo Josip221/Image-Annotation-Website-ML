@@ -41,6 +41,15 @@ const Wrapper = styled.div`
     border: 2px solid ${props => props.theme.colors.second};
   }
 
+  .done-rectangle-active {
+    border: 2px solid red;
+    &::before {
+      position: absolute;
+      content: 'Label';
+      top: -20px;
+    }
+  }
+
   .image-grid {
     width: 100%;
     display: grid;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import * as ReactDOM from 'react-dom';
 import styled from 'styled-components';
 
@@ -26,20 +26,29 @@ const Wrapper = styled.div`
   }
 `;
 
-function Label({
-  label,
-  index,
-  deleteLabel,
-}: {
+interface Props {
   label: LabelProp;
   index: number;
   deleteLabel: (index: number) => void;
-}) {
-  const rectangle = ReactDOM.findDOMNode(
-    document.querySelector(`.done-rectangle[data-set-key="${index}"]`)
-  );
-  const handleHover = () => {
+}
+
+function Label({ label, index, deleteLabel }: Props) {
+  let rectangle: Element | null;
+  const handleHoverOn = () => {
+    rectangle = document.querySelector(
+      `.done-rectangle[data-set-key="${index}"]`
+    );
     console.log(rectangle);
+    //console.log(rectangle);
+    if (rectangle) {
+      rectangle.classList.add('done-rectangle-active');
+    }
+    //rectangle.
+  };
+  const handleHoverOff = () => {
+    if (rectangle) {
+      rectangle.classList.remove('done-rectangle-active');
+    }
     //rectangle.
   };
 
@@ -48,7 +57,7 @@ function Label({
   };
 
   return (
-    <Wrapper onMouseEnter={handleHover}>
+    <Wrapper onMouseLeave={handleHoverOff} onMouseEnter={handleHoverOn}>
       <div className="label-header">
         <span>Label: {index + 1}</span>
         <span onClick={handleDeleteClick}>X</span>
