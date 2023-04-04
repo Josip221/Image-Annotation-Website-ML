@@ -21,12 +21,11 @@ function HomePage() {
   return (
     <Wrapper>
       <div className="homepage-box">
-        <p>LOREM IPSUM</p>
+        <p>WHO WE ARE</p>
       </div>
-      <div className="homepage-box">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, WHAT WE DO
-      </div>
-      <div className="homepage-box">WHO WE ARE</div>
+      <div className="homepage-box">WHAT WE DO</div>
+      <div className="homepage-box">CAMERA LOCATIONS</div>
+      <div className="homepage-box">CONTACT</div>
     </Wrapper>
   );
 }

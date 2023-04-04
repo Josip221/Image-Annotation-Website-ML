@@ -15,11 +15,12 @@ const Wrapper = styled.div`
     position: relative;
     user-select: none;
     grid-area: 1/3/2/4;
+    margin-bottom: 50px;
   }
   .img {
     width: 100%;
+    height: 100%;
     object-fit: contain;
-    border: 4px solid red;
     pointer-events: none;
   }
   .select-box {
@@ -32,7 +33,19 @@ const Wrapper = styled.div`
   }
   .draw-rectangle {
     position: absolute;
-    border: 2px dashed red;
+    border: 2px dashed ${props => props.theme.colors.second};
+  }
+
+  .done-rectangle {
+    position: absolute;
+    border: 2px solid ${props => props.theme.colors.second};
+    z-index: 1;
+
+    &:hover::before {
+      content: 'Label ${props => props.key}';
+      position: absolute;
+      top: -20px;
+    }
   }
 
   .image-grid {
@@ -121,7 +134,7 @@ function DashboardPage() {
   const [endCoords, setEndCoords] = useState({ x: 0, y: 0 });
   const [drawing, setDrawing] = useState(false);
   const [labels, setLabels] = useState<LabelProp[]>([]);
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(4);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const imageRef = useRef<HTMLImageElement>(null);
 
   const handleMouseDown = (event: React.MouseEvent) => {
@@ -152,15 +165,12 @@ function DashboardPage() {
   };
 
   const handleMouseUp = (): void => {
-    console.log('Label: ');
-    console.log(`x1: ${startCoords.x} y1: ${Math.round(startCoords.y)}`);
-    console.log(`x2: ${endCoords.x} y2: ${Math.round(endCoords.y)}`);
     setDrawing(false);
     const newLabel: LabelProp = {
       x1: startCoords.x,
       x2: endCoords.x,
-      y1: startCoords.x,
-      y2: endCoords.y,
+      y1: Math.round(startCoords.y),
+      y2: Math.round(endCoords.y),
     };
     setLabels(prev => [...prev, newLabel]);
   };
@@ -186,9 +196,8 @@ function DashboardPage() {
   };
 
   useEffect(() => {
-    console.log(labels);
-    //draw rectangle
-  }, [labels]);
+    setLabels([]);
+  }, [selectedImageIndex]);
 
   return (
     <Wrapper>
@@ -217,6 +226,21 @@ function DashboardPage() {
               }}
             />
           )}
+          {labels &&
+            labels.map((item, index) => {
+              return (
+                <div
+                  key={index}
+                  className="done-rectangle"
+                  style={{
+                    left: Math.min(item.x1, item.x2),
+                    top: Math.min(item.y1, item.y2),
+                    width: Math.abs(item.x2 - item.x1),
+                    height: Math.abs(item.y2 - item.y1),
+                  }}
+                />
+              );
+            })}
           <div
             className="select-box"
             onMouseDown={handleMouseDown}
@@ -231,7 +255,7 @@ function DashboardPage() {
         <div className="labels">
           {labels &&
             labels.map((item, index) => {
-              return <Label label={item} />;
+              return <Label key={index} index={index} label={item} />;
             })}
         </div>
       </div>

@@ -11,7 +11,7 @@ const Wrapper = styled.div`
     background-color: ${props => props.theme.colors.second};
   }
   .slider-item_active {
-    border: 4px red solid;
+    border: 4px ${props => props.theme.colors.second} solid;
   }
 
   .slider-photo {
