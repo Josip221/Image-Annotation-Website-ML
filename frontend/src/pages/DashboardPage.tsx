@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import SliderItem from '../components/SliderItem';
-import Button from '../components/Button';
 import Label from '../components/Label';
 
 const Wrapper = styled.div`
@@ -30,6 +29,7 @@ const Wrapper = styled.div`
     right: 0;
     bottom: 0;
     cursor: pointer;
+    z-index: 1;
   }
   .draw-rectangle {
     position: absolute;
@@ -39,13 +39,6 @@ const Wrapper = styled.div`
   .done-rectangle {
     position: absolute;
     border: 2px solid ${props => props.theme.colors.second};
-    z-index: 1;
-
-    &:hover::before {
-      content: 'Label ${props => props.key}';
-      position: absolute;
-      top: -20px;
-    }
   }
 
   .image-grid {
@@ -76,16 +69,6 @@ const Wrapper = styled.div`
     justify-content: start;
     flex-direction: column;
     gap: 5px;
-  }
-
-  .label {
-    background-color: ${props => props.theme.colors.second};
-    border-radius: 10px;
-    padding: 0.2em;
-  }
-
-  .label-button {
-    margin-top: auto;
   }
 
   .slider-container {
@@ -195,6 +178,12 @@ function DashboardPage() {
     if (selectedImageIndex === 4) setSelectedImageIndex(0);
   };
 
+  const deleteLabel = (index: number) => {
+    const updatedLabels = [...labels];
+    updatedLabels.splice(index, 1);
+    setLabels(updatedLabels);
+  };
+
   useEffect(() => {
     setLabels([]);
   }, [selectedImageIndex]);
@@ -226,10 +215,12 @@ function DashboardPage() {
               }}
             />
           )}
+          {/* select boxes */}
           {labels &&
             labels.map((item, index) => {
               return (
                 <div
+                  data-set-key={index}
                   key={index}
                   className="done-rectangle"
                   style={{
@@ -255,7 +246,14 @@ function DashboardPage() {
         <div className="labels">
           {labels &&
             labels.map((item, index) => {
-              return <Label key={index} index={index} label={item} />;
+              return (
+                <Label
+                  deleteLabel={deleteLabel}
+                  key={index}
+                  index={index}
+                  label={item}
+                />
+              );
             })}
         </div>
       </div>
