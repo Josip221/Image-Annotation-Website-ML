@@ -1,11 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { imgUrls } from '../networking/mockupImgs';
+import Slider from '../components/Slider';
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  width: 100%;
+`;
 
 const ImageWrapper = styled.div`
   width: 600px;
+  display: flex;
 
   .main-image {
     vertical-align: top;
@@ -154,6 +158,11 @@ function DashboardPage() {
           />
         )}
       </ImageWrapper>
+      <Slider
+        sliderInfo={imgUrls}
+        setCurrentImageIndex={setCurrentImageIndex}
+        currentImageIndex={currentImageIndex}
+      />
     </Wrapper>
   );
 }
