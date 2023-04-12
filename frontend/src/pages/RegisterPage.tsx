@@ -52,7 +52,7 @@ function RegisterPage() {
         type={'password'}
         placeholder={'Enter Password'}
       />
-      <Button parentFunction={onSubmit}>Register</Button>
+
       <div>
         Already got an account? <Link to="/login">Log in</Link>
       </div>

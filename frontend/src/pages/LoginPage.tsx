@@ -41,7 +41,7 @@ function LoginPage() {
         type={'password'}
         placeholder={'Enter Password'}
       />
-      <Button parentFunction={onSubmit}>Log in</Button>
+      <button>Login in</button>
       <div>
         Don't have an account? <Link to="/register">Register</Link>
       </div>

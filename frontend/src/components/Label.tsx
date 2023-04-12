@@ -39,17 +39,14 @@ function Label({ label, index, deleteLabel }: Props) {
       `.done-rectangle[data-set-key="${index}"]`
     );
     console.log(rectangle);
-    //console.log(rectangle);
     if (rectangle) {
       rectangle.classList.add('done-rectangle-active');
     }
-    //rectangle.
   };
   const handleHoverOff = () => {
     if (rectangle) {
       rectangle.classList.remove('done-rectangle-active');
     }
-    //rectangle.
   };
 
   const handleDeleteClick = () => {

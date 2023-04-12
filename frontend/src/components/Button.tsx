@@ -14,23 +14,14 @@ const Wrapper = styled.div`
 `;
 
 interface ButtonProps {
-  children: string;
-  parentFunction?: () => void;
+  children?: React.ReactNode;
+  onClick: () => void;
 }
 
-function Button({ children, parentFunction }: ButtonProps) {
-  const handleClick = () => {
-    parentFunction?.();
-  };
-
-  //fix enter key press
-  const handlePress = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    //if (e.key === 'Enter') parentFunction?.();
-  };
-
+function Button({ children, onClick }: ButtonProps) {
   return (
     <Wrapper>
-      <button onKeyDown={handlePress} onClick={handleClick} className="button">
+      <button onClick={onClick} className="button">
         {children}
       </button>
     </Wrapper>
