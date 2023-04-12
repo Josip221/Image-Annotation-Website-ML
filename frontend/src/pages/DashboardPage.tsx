@@ -1,102 +1,38 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import SliderItem from '../components/SliderItem';
-import Label from '../components/Label';
 
-const Wrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  padding: 1em;
+const Wrapper = styled.div``;
 
-  .img-container {
-    position: relative;
-    user-select: none;
-    grid-area: 1/3/2/4;
-    margin-bottom: 50px;
+const ImageWrapper = styled.div`
+  width: 600px;
+
+  img:focus {
+    background-color: red;
   }
-  .img {
+
+  .img:focus-within {
+    border: none;
+  }
+
+  .main-image {
     width: 100%;
-    height: 100%;
     object-fit: contain;
-    pointer-events: none;
+    cursor: pointer;
   }
-  .select-box {
+
+  .main-image-fullscreen {
     position: absolute;
+    object-fit: contain;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    cursor: pointer;
-    z-index: 1;
-  }
-  .draw-rectangle {
-    position: absolute;
-    border: 2px dashed ${props => props.theme.colors.second};
-  }
-
-  .done-rectangle {
-    position: absolute;
-    border: 2px solid ${props => props.theme.colors.second};
-  }
-
-  .done-rectangle-active {
-    border: 2px solid red;
-    &::before {
-      position: absolute;
-      content: 'Label';
-      top: -20px;
-    }
-  }
-
-  .image-grid {
+    height: 100%;
     width: 100%;
-    display: grid;
-    grid-template-rows: 1fr;
-    grid-template-columns: 100px 50px 2fr 50px 1fr 100px;
-  }
-
-  .arrow {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-  }
-
-  .arrow-left {
-    grid-area: 1/2/1/3;
-  }
-
-  .arrow-right {
-    grid-area: 1/4/1/5;
-  }
-
-  .labels {
-    grid-area: 1/5/2/6;
-    display: flex;
-    justify-content: start;
-    flex-direction: column;
-    gap: 5px;
-  }
-
-  .slider-container {
-    width: 100%;
-    display: grid;
-    grid-template-rows: 1fr;
-    grid-template-columns: 50px 1fr 50px;
-    gap: 0.2em;
-  }
-
-  .slider {
-    grid-area: 1/2/1/3;
-    display: flex;
-    justify-content: space-between;
-    gap: 5px;
+    background-color: black;
+    pointer-events: none;
   }
 `;
 
-const sliderInfo = [
+const imgUrls = [
   {
     img: 'https://ec.europa.eu/research-and-innovation/sites/default/files/hm/field/image/wildfire-1826204_1280.jpg',
   },
@@ -114,173 +50,62 @@ const sliderInfo = [
   },
 ];
 
-interface LabelProp {
-  x1: number;
-  x2: number;
-  y1: number;
-  y2: number;
-}
-
 function DashboardPage() {
-  const [startCoords, setStartCoords] = useState({ x: 0, y: 0 });
-  const [endCoords, setEndCoords] = useState({ x: 0, y: 0 });
-  const [drawing, setDrawing] = useState(false);
-  const [labels, setLabels] = useState<LabelProp[]>([]);
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+  const [isFullscren, setIsFullscreen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const imageWrapperRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
-  const handleMouseDown = (event: React.MouseEvent) => {
-    let x = 0,
-      y = 0;
-    const { clientX, clientY } = event;
-    if (imageRef.current) {
-      const rect = imageRef.current.getBoundingClientRect();
-      x = clientX - rect.left;
-      y = clientY - rect.top;
-    }
-
-    setStartCoords({ x: x, y: y });
-    setEndCoords({ x: x, y: y });
-    setDrawing(true);
+  const toggleFullscreen = () => {
+    setIsFullscreen(prevVal => !prevVal);
+    console.log(isFullscren);
   };
 
-  const handleMouseMove = (event: React.MouseEvent) => {
-    if (drawing && imageRef.current) {
-      const { clientX, clientY } = event;
-      const rect = imageRef.current.getBoundingClientRect();
-      let newEndCoords = {
-        x: clientX - rect.left,
-        y: clientY - rect.top,
-      };
-      setEndCoords(newEndCoords);
+  const handleMainImageClick = (event: React.MouseEvent) => {
+    if (!isFullscren) {
+      toggleFullscreen();
     }
   };
 
-  const handleMouseUp = (): void => {
-    setDrawing(false);
-    const newLabel: LabelProp = {
-      x1: startCoords.x,
-      x2: endCoords.x,
-      y1: Math.round(startCoords.y),
-      y2: Math.round(endCoords.y),
-    };
-    setLabels(prev => [...prev, newLabel]);
-  };
+  const handleKeyClick = (event: React.KeyboardEvent) => {
+    if (isFullscren) {
+      if (event.key === 'ArrowLeft') {
+        setCurrentImageIndex(prevIndex => prevIndex - 1);
+      }
 
-  const handleMouseLeave = () => {
-    setDrawing(false);
-  };
-
-  const handleSliderImageClick = (imageIndex: number) => {
-    setSelectedImageIndex(imageIndex);
-  };
-
-  const handleLeftArrow = () => {
-    if (selectedImageIndex > 0 && selectedImageIndex < 5)
-      setSelectedImageIndex(selectedImageIndex - 1);
-    if (selectedImageIndex === 0) setSelectedImageIndex(4);
-  };
-
-  const handleRightArrow = () => {
-    if (selectedImageIndex >= 0 && selectedImageIndex < 5)
-      setSelectedImageIndex(selectedImageIndex + 1);
-    if (selectedImageIndex === 4) setSelectedImageIndex(0);
-  };
-
-  const deleteLabel = (index: number) => {
-    const updatedLabels = [...labels];
-    updatedLabels.splice(index, 1);
-    setLabels(updatedLabels);
+      if (event.key === 'ArrowRight') {
+        setCurrentImageIndex(prevIndex => prevIndex + 1);
+      }
+      if (event.key === 'Escape') {
+        imageWrapperRef.current?.blur();
+        toggleFullscreen();
+      }
+    }
   };
 
   useEffect(() => {
-    setLabels([]);
-  }, [selectedImageIndex]);
+    console.log(currentImageIndex);
+    if (imageRef.current) imageRef.current.src = imgUrls[currentImageIndex].img;
+  }, [currentImageIndex]);
 
   return (
-    <Wrapper>
-      <div>
-        If you see fire, label it! If you don't see the fire, skip the image.
-      </div>
-      <div className="image-grid">
-        <span onClick={handleLeftArrow} className="arrow arrow-left">
-          {'<'}
-        </span>
-        <div className="img-container">
-          <img
-            className="img"
-            ref={imageRef}
-            alt="smoke"
-            src={sliderInfo[selectedImageIndex].img}
-          />
-          {drawing && (
-            <div
-              className="draw-rectangle"
-              style={{
-                left: Math.min(startCoords.x, endCoords.x),
-                top: Math.min(startCoords.y, endCoords.y),
-                width: Math.abs(endCoords.x - startCoords.x),
-                height: Math.abs(endCoords.y - startCoords.y),
-              }}
-            />
-          )}
-          {/* select boxes */}
-          {labels &&
-            labels.map((item, index) => {
-              return (
-                <div
-                  data-set-key={index}
-                  key={index}
-                  className="done-rectangle"
-                  style={{
-                    left: Math.min(item.x1, item.x2),
-                    top: Math.min(item.y1, item.y2),
-                    width: Math.abs(item.x2 - item.x1),
-                    height: Math.abs(item.y2 - item.y1),
-                  }}
-                />
-              );
-            })}
-          <div
-            className="select-box"
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            onMouseUp={handleMouseUp}
-          />
-        </div>
-        <span onClick={handleRightArrow} className="arrow arrow-right">
-          {'>'}
-        </span>
-        <div className="labels">
-          {labels &&
-            labels.map((item, index) => {
-              return (
-                <Label
-                  deleteLabel={deleteLabel}
-                  key={index}
-                  index={index}
-                  label={item}
-                />
-              );
-            })}
-        </div>
-      </div>
-      <div className="slider-container">
-        <div className="slider">
-          {sliderInfo.map((item, index) => {
-            return (
-              <SliderItem
-                handleImageClick={handleSliderImageClick}
-                active={selectedImageIndex === index ? true : false}
-                key={index}
-                index={index}
-                img={item.img}
-              />
-            );
-          })}
-        </div>
-      </div>
+    <Wrapper id="dashboard">
+      <ImageWrapper
+        ref={imageWrapperRef}
+        tabIndex={0}
+        id="image-wrapper"
+        onClick={handleMainImageClick}
+        onKeyDown={handleKeyClick}
+      >
+        <img
+          ref={imageRef}
+          id="main-image"
+          className={isFullscren ? 'main-image-fullscreen' : 'main-image'}
+          src={imgUrls[0].img}
+          alt="select smoke"
+        />
+      </ImageWrapper>
     </Wrapper>
   );
 }
