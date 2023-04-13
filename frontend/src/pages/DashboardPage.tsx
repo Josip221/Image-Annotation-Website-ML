@@ -23,8 +23,8 @@ const ImageWrapper = styled.div`
     object-fit: contain;
     top: 0;
     left: 0;
-    height: 100%;
     width: 100%;
+    height: 100%;
     background-color: black;
     pointer-events: none;
   }
