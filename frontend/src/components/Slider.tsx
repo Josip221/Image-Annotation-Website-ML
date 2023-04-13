@@ -20,7 +20,6 @@ function Slider({
   currentImageIndex,
 }: SliderProps) {
   const handleClick = (newIndex: number) => {
-    console.log(currentImageIndex);
     setCurrentImageIndex(newIndex);
   };
   return (
