@@ -14,7 +14,7 @@ export default function ErrorPage() {
   return (
     <Wrapper>
       <h1>Oops!</h1>
-      <p>Sorry, an unexpected error has occurred.</p>
+      <p>Sorry, this page doesn't exist.</p>
 
       <p>
         <i>
