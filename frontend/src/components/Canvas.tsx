@@ -24,8 +24,8 @@ const Canvas = ({ dots }: CanvasProps) => {
                 y1={dots[i].y}
                 x2={dots[i + 1] ? dots[i + 1].x : dots[0].x}
                 y2={dots[i + 1] ? dots[i + 1].y : dots[0].y}
-                stroke="orange"
-                strokeWidth="2"
+                stroke="red"
+                strokeWidth="1"
               />
             );
           })}

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { imgUrls } from '../networking/mockupImgs';
 import Slider from '../components/Slider';
@@ -12,6 +12,10 @@ const dots = [
   { x: 50, y: 100 },
   { x: 200, y: 100 },
   { x: 200, y: 50 },
+  { x: 250, y: 50 },
+  { x: 250, y: 20 },
+  { x: 200, y: 20 },
+  { x: 50, y: 20 },
 ];
 
 const Wrapper = styled.div``;
@@ -36,8 +40,8 @@ const ImageWrapper = styled.div`
     align-items: center;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background-color: black;
   }
 
@@ -46,21 +50,11 @@ const ImageWrapper = styled.div`
     max-height: 100vh;
     pointer-events: none;
     background-color: black;
-    //position: absolute;
     object-fit: contain;
-    /*
-    width: 100%;
-    height: 100%;
-    background-color: black;
-    pointer-events: none; */
   }
 
   .selection-box {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
     cursor: pointer;
     z-index: 1;
   }
@@ -71,6 +65,13 @@ function DashboardPage() {
   const [startCoords, setStartCoords] = useState({ x: 0, y: 0 });
   const [endCoords, setEndCoords] = useState({ x: 0, y: 0 });
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const [currentImageRect, setCurrentImageRect] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+    height: 0,
+  });
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [isDrawing, setIsDrawing] = useState({ active: false, type: 'draw' });
 
@@ -80,13 +81,10 @@ function DashboardPage() {
   const onScroll = (e: React.WheelEvent) => {
     const delta = e.deltaY * -0.01;
     const newScale = pos.scale + delta;
-    //limit zoom
-    const minScale = 0;
-    const maxScale = 6;
-    //console.log('new scale: ', newScale);
-    // Check if newScale is within the allowable range
+    const minScale = 1;
+    const maxScale = 4;
+
     if (newScale >= minScale && newScale <= maxScale) {
-      // if 1, reset everything
       if (newScale === 1) {
         setPos({ scale: 1, x: 0, y: 0 });
         return;
@@ -101,16 +99,12 @@ function DashboardPage() {
   };
 
   const toggleFullscreen = () => {
-    setIsFullscreen(prevVal => {
-      return !prevVal;
-    });
+    setIsFullscreen(prevVal => !prevVal);
   };
 
   const handleMainImageClick = (event: React.MouseEvent) => {
     event.preventDefault();
-    if (!isFullscreen) {
-      toggleFullscreen();
-    }
+    if (!isFullscreen) toggleFullscreen();
   };
 
   const handleKeyClick = (event: React.KeyboardEvent) => {
@@ -130,36 +124,26 @@ function DashboardPage() {
   };
 
   const handleMouseDown = (event: React.MouseEvent) => {
-    let x = 0;
-    let y = 0;
-    const { clientX, clientY } = event;
     if (imageRef.current) {
-      //const rect = imageRef.current.getBoundingClientRect();
-      x = clientX;
-      y = clientY;
-      setStartCoords({ x: x, y: y });
-      setEndCoords({ x: x, y: y });
-      if (event.button === 0) setIsDrawing({ active: true, type: 'draw' });
+      let x = event.clientX;
+      let y = event.clientY;
+      console.log();
+      setStartCoords({ x, y });
+      setEndCoords({ x, y });
+      if (event.button === 0)
+        setIsDrawing({ active: true, type: 'draw' }); // event 0 is left click
       else setIsDrawing({ active: true, type: 'delete' });
     }
   };
   const handleMouseMove = (event: React.MouseEvent) => {
-    if (isDrawing.active && imageRef.current) {
-      const { clientX, clientY } = event;
-      //const rect = imageRef.current.getBoundingClientRect();
-      //actual coords are minus the rect.left and rect.top
-      let newEndCoords = {
-        x: clientX,
-        y: clientY,
-      };
-      setEndCoords(newEndCoords);
-    }
+    if (isDrawing.active && imageRef.current)
+      setEndCoords({
+        x: event.clientX,
+        y: event.clientY,
+      });
   };
 
   const handleMouseUp = (): void => {
-    console.log(startCoords, endCoords);
-    console.log(`Width: ${Math.abs(startCoords.x - endCoords.x)} px`);
-    console.log(`Height: ${Math.abs(startCoords.y - endCoords.y)} px`);
     setIsDrawing(prev => ({ type: prev.type, active: false }));
     getAllCoordsOfRectangle({ startCoords, endCoords });
   };
@@ -168,10 +152,25 @@ function DashboardPage() {
     setIsDrawing(prev => ({ type: prev.type, active: false }));
   };
 
+  useEffect(() => {
+    if (isFullscreen && imageRef.current) {
+      const rect = imageRef.current.getBoundingClientRect();
+      console.log(imageRef.current.src);
+      // print style top and left of imageref
+      console.log(imageRef.current.style.top);
+
+      console.log(rect);
+      setCurrentImageRect({
+        top: rect.y,
+        left: rect.x,
+        width: rect.width,
+        height: rect.height,
+      });
+    }
+  }, [isFullscreen, currentImageIndex]);
+
   return (
     <Wrapper>
-      <h1>Camera 10204</h1>
-      <h2>Location X</h2>
       <ImageWrapper
         ref={imageWrapperRef}
         tabIndex={0}
@@ -201,12 +200,18 @@ function DashboardPage() {
             ></img>
             <div
               className="selection-box"
+              style={{
+                top: currentImageRect.top,
+                left: currentImageRect.left,
+                width: `${currentImageRect.width}px`,
+                height: `${currentImageRect.height}px`,
+              }}
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
               onMouseUp={handleMouseUp}
             />
-
+            <Canvas dots={dots} />
             {isDrawing.active && (
               <SelectBox
                 type={isDrawing.type}
@@ -214,7 +219,6 @@ function DashboardPage() {
                 endCoords={endCoords}
               />
             )}
-            <Canvas dots={dots} />
           </div>
         )}
       </ImageWrapper>

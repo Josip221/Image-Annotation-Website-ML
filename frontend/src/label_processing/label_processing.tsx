@@ -1,29 +1,38 @@
-interface CoordProps {
-  startCoords: { x: number; y: number };
-  endCoords: { x: number; y: number };
-}
-
-interface Dots {
-  dot: { x: number; y: number }[];
-}
+//dots
+const dots: { x: number; y: number }[] = [
+  { x: 50, y: 50 },
+  { x: 50, y: 100 },
+  { x: 200, y: 100 },
+  { x: 200, y: 150 },
+  { x: 200, y: 200 },
+  { x: 250, y: 200 },
+  { x: 250, y: 50 },
+];
 
 export const getAllCoordsOfRectangle = ({
   startCoords,
   endCoords,
-}: CoordProps) => {
-  // z pattern for coords. A rectangle has 4 dots x1 x2 x3 x4
-  //   const x1 = startCoords.x;
-  //   const x2 = endCoords.x;
-  //   const x3 = startCoords.x;
-  //   const x4 = endCoords.x;
-  //   const y1 = startCoords.y;
-  //   const y2 = startCoords.y;
-  //   const y3 = endCoords.y;
-  //   const y4 = endCoords.y;
-  //   console.log(`Point 1: x1 ${x1} y1 ${y1}\n`);
-  //   console.log(`Point 2: x2 ${x2} y2 ${y2}\n`);
-  //   console.log(`Point 3: x3 ${x3} y3 ${y3}\n`);
-  //   console.log(`Point 4: x4 ${x4} y4 ${y4}\n`);
+}: {
+  startCoords: { x: number; y: number };
+  endCoords: { x: number; y: number };
+}) => {
+  console.log(startCoords, endCoords);
 };
 
-//USE JS CANVAS CLIP() FOR MERGING TWO RECTANGLES, CHECK FIRST IF THEY INTERSECT
+export const check = () => {
+  for (let i = 0; i < dots.length; i++) {
+    if (i === dots.length - 1) {
+      console.log(
+        `Line ${i + 1}: \n From x ${dots[i].x} y ${dots[i].y}\n To x ${
+          dots[0].x
+        } y ${dots[0].y}\n`
+      );
+    } else {
+      console.log(
+        `Line ${i + 1}: \n From x ${dots[i].x} y ${dots[i].y}\n To x ${
+          dots[i + 1].x
+        } y ${dots[i + 1].y}\n`
+      );
+    }
+  }
+};
