@@ -1,7 +1,18 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { imgUrls } from '../networking/mockupImgs';
 import Slider from '../components/Slider';
+import SelectBox from '../components/SelectBox';
+
+import { getAllCoordsOfRectangle } from '../label_processing/label_processing';
+import Canvas from '../components/Canvas';
+
+const dots = [
+  { x: 50, y: 50 },
+  { x: 50, y: 100 },
+  { x: 200, y: 100 },
+  { x: 200, y: 50 },
+];
 
 const Wrapper = styled.div``;
 
@@ -61,7 +72,7 @@ function DashboardPage() {
   const [endCoords, setEndCoords] = useState({ x: 0, y: 0 });
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-  const [isDrawing, setIsDrawing] = useState(false);
+  const [isDrawing, setIsDrawing] = useState({ active: false, type: 'draw' });
 
   const imageWrapperRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -69,6 +80,7 @@ function DashboardPage() {
   const onScroll = (e: React.WheelEvent) => {
     const delta = e.deltaY * -0.01;
     const newScale = pos.scale + delta;
+    //limit zoom
     const minScale = 0;
     const maxScale = 6;
     //console.log('new scale: ', newScale);
@@ -122,19 +134,19 @@ function DashboardPage() {
     let y = 0;
     const { clientX, clientY } = event;
     if (imageRef.current) {
-      const rect = imageRef.current.getBoundingClientRect();
+      //const rect = imageRef.current.getBoundingClientRect();
       x = clientX;
       y = clientY;
+      setStartCoords({ x: x, y: y });
+      setEndCoords({ x: x, y: y });
+      if (event.button === 0) setIsDrawing({ active: true, type: 'draw' });
+      else setIsDrawing({ active: true, type: 'delete' });
     }
-
-    setStartCoords({ x: x, y: y });
-    setEndCoords({ x: x, y: y });
-    setIsDrawing(true);
   };
   const handleMouseMove = (event: React.MouseEvent) => {
-    if (isDrawing && imageRef.current) {
+    if (isDrawing.active && imageRef.current) {
       const { clientX, clientY } = event;
-      const rect = imageRef.current.getBoundingClientRect();
+      //const rect = imageRef.current.getBoundingClientRect();
       //actual coords are minus the rect.left and rect.top
       let newEndCoords = {
         x: clientX,
@@ -148,19 +160,22 @@ function DashboardPage() {
     console.log(startCoords, endCoords);
     console.log(`Width: ${Math.abs(startCoords.x - endCoords.x)} px`);
     console.log(`Height: ${Math.abs(startCoords.y - endCoords.y)} px`);
-    setIsDrawing(false);
+    setIsDrawing(prev => ({ type: prev.type, active: false }));
+    getAllCoordsOfRectangle({ startCoords, endCoords });
   };
 
   const handleMouseLeave = () => {
-    setIsDrawing(false);
+    setIsDrawing(prev => ({ type: prev.type, active: false }));
   };
 
   return (
-    <Wrapper id="dashboard">
+    <Wrapper>
+      <h1>Camera 10204</h1>
+      <h2>Location X</h2>
       <ImageWrapper
-        id="image-wrapper"
         ref={imageWrapperRef}
         tabIndex={0}
+        onContextMenu={event => event.preventDefault()} //disable menu on right click
         onClick={handleMainImageClick}
         onKeyDown={handleKeyClick}
       >
@@ -172,7 +187,6 @@ function DashboardPage() {
             alt="select smoke"
           />
         )}
-
         {isFullscreen && (
           <div className="container-fullscreen" onWheelCapture={onScroll}>
             <img
@@ -193,18 +207,14 @@ function DashboardPage() {
               onMouseUp={handleMouseUp}
             />
 
-            {isDrawing && (
-              <div
-                style={{
-                  position: 'absolute',
-                  border: '2px dashed red',
-                  left: Math.min(startCoords.x, endCoords.x),
-                  top: Math.min(startCoords.y, endCoords.y),
-                  width: Math.abs(endCoords.x - startCoords.x),
-                  height: Math.abs(endCoords.y - startCoords.y),
-                }}
+            {isDrawing.active && (
+              <SelectBox
+                type={isDrawing.type}
+                startCoords={startCoords}
+                endCoords={endCoords}
               />
             )}
+            <Canvas dots={dots} />
           </div>
         )}
       </ImageWrapper>

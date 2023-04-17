@@ -54,7 +54,7 @@ function Navbar() {
         </Link>
       </NavBar>
       <Outlet />
-      <Footer>Footer</Footer>
+      {/* <Footer>Footer</Footer> */}
     </Wrapper>
   );
 }
