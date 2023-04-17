@@ -16,7 +16,11 @@ export const getAllCoordsOfRectangle = ({
   startCoords: { x: number; y: number };
   endCoords: { x: number; y: number };
 }) => {
-  console.log(startCoords, endCoords);
+  const x1 = { x: startCoords.x, y: startCoords.y };
+  const x2 = { x: endCoords.x, y: startCoords.y };
+  const x3 = { x: endCoords.x, y: endCoords.y };
+  const x4 = { x: startCoords.x, y: endCoords.y };
+  return [x1, x2, x3, x4];
 };
 
 export const check = () => {

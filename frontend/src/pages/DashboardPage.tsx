@@ -1,22 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { imgUrls } from '../networking/mockupImgs';
+import { getAllCoordsOfRectangle } from '../label_processing/label_processing';
 import Slider from '../components/Slider';
 import SelectBox from '../components/SelectBox';
-
-import { getAllCoordsOfRectangle } from '../label_processing/label_processing';
 import Canvas from '../components/Canvas';
-
-const dots = [
-  { x: 50, y: 50 },
-  { x: 50, y: 100 },
-  { x: 200, y: 100 },
-  { x: 200, y: 50 },
-  { x: 250, y: 50 },
-  { x: 250, y: 20 },
-  { x: 200, y: 20 },
-  { x: 50, y: 20 },
-];
 
 const Wrapper = styled.div``;
 
@@ -98,9 +86,7 @@ function DashboardPage() {
     }
   };
 
-  const toggleFullscreen = () => {
-    setIsFullscreen(prevVal => !prevVal);
-  };
+  const toggleFullscreen = () => setIsFullscreen(prevVal => !prevVal);
 
   const handleMainImageClick = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -127,7 +113,6 @@ function DashboardPage() {
     if (imageRef.current) {
       let x = event.clientX;
       let y = event.clientY;
-      console.log();
       setStartCoords({ x, y });
       setEndCoords({ x, y });
       if (event.button === 0)
@@ -149,17 +134,13 @@ function DashboardPage() {
   };
 
   const handleMouseLeave = () => {
-    setIsDrawing(prev => ({ type: prev.type, active: false }));
+    if (isDrawing.active)
+      setIsDrawing(prev => ({ type: prev.type, active: false }));
   };
 
   useEffect(() => {
     if (isFullscreen && imageRef.current) {
       const rect = imageRef.current.getBoundingClientRect();
-      console.log(imageRef.current.src);
-      // print style top and left of imageref
-      console.log(imageRef.current.style.top);
-
-      console.log(rect);
       setCurrentImageRect({
         top: rect.y,
         left: rect.x,
@@ -211,7 +192,10 @@ function DashboardPage() {
               onMouseLeave={handleMouseLeave}
               onMouseUp={handleMouseUp}
             />
-            <Canvas dots={dots} />
+            <Canvas
+              dots={getAllCoordsOfRectangle({ startCoords, endCoords })}
+              currentImageRect={currentImageRect}
+            />
             {isDrawing.active && (
               <SelectBox
                 type={isDrawing.type}
