@@ -15,7 +15,6 @@ interface SliderProps {
 
 function Slider({ sliderInfo }: SliderProps) {
   const { currentImageIndex } = useContext(Context) as any; //FIX
-
   return (
     <Wrapper>
       {sliderInfo.map((item, index) => {

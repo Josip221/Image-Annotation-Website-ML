@@ -1,5 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useContext } from 'react';
 import styled from 'styled-components';
+import { Context } from '../context/context';
 
 const Wrapper = styled.div`
   position: absolute;
@@ -9,17 +10,17 @@ const Wrapper = styled.div`
   }
 `;
 
-interface CanvasProps {
-  dots: { x: number; y: number }[];
-  currentImageRect: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  };
-}
+const Canvas = () => {
+  const { currentImageRect, selections, currentImageIndex } = useContext(
+    Context
+  ) as any;
 
-const Canvas = ({ dots, currentImageRect }: CanvasProps) => {
+  if (selections) {
+    const currentSelects = selections.filter(
+      (el: any) => el.imageId === currentImageIndex
+    );
+  }
+
   return (
     <Wrapper
       style={{
@@ -30,28 +31,20 @@ const Canvas = ({ dots, currentImageRect }: CanvasProps) => {
       }}
     >
       <svg>
-        {dots &&
-          dots.map((dot, i) => {
+        {/* {selections &&
+          selections.map((selection: any, i) => {
             return (
               <line
                 key={i}
-                x1={dots[i].x - currentImageRect.left}
-                y1={dots[i].y - currentImageRect.top}
-                x2={
-                  dots[i + 1]
-                    ? dots[i + 1].x - currentImageRect.left
-                    : dots[0].x - currentImageRect.left
-                }
-                y2={
-                  dots[i + 1]
-                    ? dots[i + 1].y - currentImageRect.top
-                    : dots[0].y - currentImageRect.top
-                }
+                x1={dots[i].x}
+                y1={dots[i].y}
+                x2={dots[i + 1] ? dots[i + 1].x : dots[0].x}
+                y2={dots[i + 1] ? dots[i + 1].y : dots[0].y}
                 stroke="red"
                 strokeWidth="2"
               />
             );
-          })}
+          })} */}
       </svg>
     </Wrapper>
   );

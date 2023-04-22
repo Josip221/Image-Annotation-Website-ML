@@ -12,6 +12,7 @@ const Wrapper = styled.div<any>`
 `;
 
 function SelectBox({ startCoords, endCoords, type }: Props) {
+  console.log('2');
   return (
     <Wrapper
       type={type}

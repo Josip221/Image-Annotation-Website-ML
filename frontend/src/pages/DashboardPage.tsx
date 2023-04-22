@@ -54,14 +54,10 @@ function DashboardPage() {
   const [pos, setPos] = useState({ x: 0, y: 0, scale: 1 });
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  //for select box
   const [startCoords, setStartCoords] = useState({ x: 0, y: 0 });
   const [endCoords, setEndCoords] = useState({ x: 0, y: 0 });
-  const [currentImageRect, setCurrentImageRect] = useState({
-    top: 0,
-    left: 0,
-    width: 0,
-    height: 0,
-  });
+
   const [isDrawing, setIsDrawing] = useState({ active: false, type: 'draw' });
 
   //refs
@@ -69,12 +65,16 @@ function DashboardPage() {
   const imageRef = useRef<HTMLImageElement>(null);
 
   //context data
-  const { selections, setCurrentImageIndex, currentImageIndex } = useContext(
-    Context
-  ) as any;
+  const {
+    selections,
+    setSelections,
+    setCurrentImageIndex,
+    currentImageIndex,
+    currentImageRect,
+    setCurrentImageRect,
+  } = useContext(Context) as any; // fix any stuff
 
   const onScroll = (e: React.WheelEvent) => {
-    // fix this
     const delta = e.deltaY * -0.01;
     const newScale = pos.scale + delta;
     const minScale = 1;
@@ -117,6 +117,7 @@ function DashboardPage() {
   };
 
   const handleMouseDown = (event: React.MouseEvent) => {
+    event.preventDefault();
     if (imageRef.current) {
       let x = event.clientX;
       let y = event.clientY;
@@ -135,9 +136,23 @@ function DashboardPage() {
       });
   };
 
-  const handleMouseUp = (): void => {
+  const handleMouseUp = (event: React.MouseEvent): void => {
+    event.preventDefault();
     setIsDrawing(prev => ({ type: prev.type, active: false }));
-    getAllCoordsOfRectangle({ startCoords, endCoords });
+    setSelections((prevItems: any) => [
+      ...prevItems,
+      {
+        imageId: currentImageIndex,
+        selection: {
+          selectionId: 0,
+          dots: getAllCoordsOfRectangle(
+            startCoords,
+            endCoords,
+            currentImageRect
+          ),
+        },
+      },
+    ]);
   };
 
   const handleMouseLeave = () => {
@@ -155,7 +170,7 @@ function DashboardPage() {
         height: rect.height,
       });
     }
-  }, [isFullscreen, currentImageIndex]);
+  }, [isFullscreen, setCurrentImageRect]);
 
   return (
     <Wrapper>
@@ -199,10 +214,7 @@ function DashboardPage() {
               onMouseLeave={handleMouseLeave}
               onMouseUp={handleMouseUp}
             />
-            <Canvas
-              dots={getAllCoordsOfRectangle({ startCoords, endCoords })}
-              currentImageRect={currentImageRect}
-            />
+            <Canvas />
             {isDrawing.active && (
               <SelectBox
                 type={isDrawing.type}
