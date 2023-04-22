@@ -1,10 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { imgUrls } from '../networking/mockupImgs';
 import { getAllCoordsOfRectangle } from '../label_processing/label_processing';
 import Slider from '../components/Slider';
 import SelectBox from '../components/SelectBox';
 import Canvas from '../components/Canvas';
+
+import { Context } from '../context/context';
 
 const Wrapper = styled.div``;
 
@@ -50,9 +52,16 @@ const ImageWrapper = styled.div`
 
 function DashboardPage() {
   const [pos, setPos] = useState({ x: 0, y: 0, scale: 1 });
+
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const {
+    selections,
+    setImageIndex,
+    currentImageIndex: smt,
+  } = useContext(Context) as any;
+
   const [startCoords, setStartCoords] = useState({ x: 0, y: 0 });
   const [endCoords, setEndCoords] = useState({ x: 0, y: 0 });
-  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const [currentImageRect, setCurrentImageRect] = useState({
     top: 0,
@@ -67,23 +76,23 @@ function DashboardPage() {
   const imageRef = useRef<HTMLImageElement>(null);
 
   const onScroll = (e: React.WheelEvent) => {
-    const delta = e.deltaY * -0.01;
-    const newScale = pos.scale + delta;
-    const minScale = 1;
-    const maxScale = 4;
-
-    if (newScale >= minScale && newScale <= maxScale) {
-      if (newScale === 1) {
-        setPos({ scale: 1, x: 0, y: 0 });
-        return;
-      }
-      const ratio = 1 - newScale / pos.scale;
-      setPos({
-        scale: newScale,
-        x: pos.x + (e.clientX - pos.x) * ratio,
-        y: pos.y + (e.clientY - pos.y) * ratio,
-      });
-    }
+    // fix this
+    // const delta = e.deltaY * -0.01;
+    // const newScale = pos.scale + delta;
+    // const minScale = 1;
+    // const maxScale = 4;
+    // if (newScale >= minScale && newScale <= maxScale) {
+    //   if (newScale === 1) {
+    //     setPos({ scale: 1, x: 0, y: 0 });
+    //     return;
+    //   }
+    //   const ratio = 1 - newScale / pos.scale;
+    //   setPos({
+    //     scale: newScale,
+    //     x: pos.x + (e.clientX - pos.x) * ratio,
+    //     y: pos.y + (e.clientY - pos.y) * ratio,
+    //   });
+    // }
   };
 
   const toggleFullscreen = () => setIsFullscreen(prevVal => !prevVal);

@@ -20,7 +20,6 @@ interface CanvasProps {
 }
 
 const Canvas = ({ dots, currentImageRect }: CanvasProps) => {
-  console.log(dots);
   return (
     <Wrapper>
       <svg

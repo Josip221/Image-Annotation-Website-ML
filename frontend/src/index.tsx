@@ -12,6 +12,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import GlobalStyle from './globalStyles.js';
 import { theme } from './globalStyles.js';
 import { ThemeProvider } from 'styled-components';
+import ContextProvider from './context/context';
 
 const router = createBrowserRouter([
   {
@@ -46,8 +47,10 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <GlobalStyle />
-      <RouterProvider router={router} />
+      <ContextProvider>
+        <GlobalStyle />
+        <RouterProvider router={router} />
+      </ContextProvider>
     </ThemeProvider>
   </React.StrictMode>
 );

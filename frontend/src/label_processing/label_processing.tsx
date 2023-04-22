@@ -40,3 +40,5 @@ export const check = () => {
     }
   }
 };
+
+//check collisions
