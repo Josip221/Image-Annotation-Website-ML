@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import SliderItem from './SliderItem';
+import { Context } from '../context/context';
 
 const Wrapper = styled.div`
   display: flex;
@@ -10,24 +11,16 @@ const Wrapper = styled.div`
 
 interface SliderProps {
   sliderInfo: { img: string }[];
-  setCurrentImageIndex: (index: number) => void;
-  currentImageIndex: number;
 }
 
-function Slider({
-  sliderInfo,
-  setCurrentImageIndex,
-  currentImageIndex,
-}: SliderProps) {
-  const handleClick = (newIndex: number) => {
-    setCurrentImageIndex(newIndex);
-  };
+function Slider({ sliderInfo }: SliderProps) {
+  const { currentImageIndex } = useContext(Context) as any; //FIX
+
   return (
     <Wrapper>
       {sliderInfo.map((item, index) => {
         return (
           <SliderItem
-            onClickHandler={handleClick}
             active={currentImageIndex === index ? true : false}
             key={index}
             index={index}

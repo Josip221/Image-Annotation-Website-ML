@@ -6,7 +6,7 @@ interface ContextProps {
     selection: { selectionId: number; dots: { x: number; y: number }[] };
   }[];
   currentImageIndex: number;
-  setImageIndex: (newValue: number) => void;
+  setCurrentImageIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const Context = React.createContext<ContextProps | null>(null);
@@ -41,17 +41,15 @@ const ContextProvider = ({ children }: any) => {
     },
   ]);
 
-  const setImageIndex = (newIndex: number) => {
-    setCurrentImageIndex(newIndex);
-  };
-
   const addNewSelection = () => {};
 
   const deleteSelection = () => {};
 
   const clearAll = () => {};
   return (
-    <Context.Provider value={{ selections, setImageIndex, currentImageIndex }}>
+    <Context.Provider
+      value={{ selections, setCurrentImageIndex, currentImageIndex }}
+    >
       {children}
     </Context.Provider>
   );

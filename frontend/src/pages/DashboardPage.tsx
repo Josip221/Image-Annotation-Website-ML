@@ -52,28 +52,23 @@ const ImageWrapper = styled.div`
 
 function DashboardPage() {
   const [pos, setPos] = useState({ x: 0, y: 0, scale: 1 });
-
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const {
-    selections,
-    setImageIndex,
-    currentImageIndex: smt,
-  } = useContext(Context) as any;
 
   const [startCoords, setStartCoords] = useState({ x: 0, y: 0 });
   const [endCoords, setEndCoords] = useState({ x: 0, y: 0 });
-
   const [currentImageRect, setCurrentImageRect] = useState({
     top: 0,
     left: 0,
     width: 0,
     height: 0,
   });
-  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [isDrawing, setIsDrawing] = useState({ active: false, type: 'draw' });
-
   const imageWrapperRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+
+  const { selections, setCurrentImageIndex, currentImageIndex } = useContext(
+    Context
+  ) as any;
 
   const onScroll = (e: React.WheelEvent) => {
     // fix this
@@ -110,11 +105,11 @@ function DashboardPage() {
 
     if (event.key === 'ArrowLeft') {
       if (currentImageIndex === 0) setCurrentImageIndex(imgUrls.length - 1);
-      else setCurrentImageIndex(prevIndex => prevIndex - 1);
+      else setCurrentImageIndex(currentImageIndex - 1);
     }
     if (event.key === 'ArrowRight') {
       if (currentImageIndex === imgUrls.length - 1) setCurrentImageIndex(0);
-      else setCurrentImageIndex(prevIndex => prevIndex + 1);
+      else setCurrentImageIndex(currentImageIndex + 1);
     }
   };
 
@@ -215,11 +210,7 @@ function DashboardPage() {
           </div>
         )}
       </ImageWrapper>
-      <Slider
-        sliderInfo={imgUrls}
-        setCurrentImageIndex={setCurrentImageIndex}
-        currentImageIndex={currentImageIndex}
-      />
+      <Slider sliderInfo={imgUrls} />
     </Wrapper>
   );
 }
