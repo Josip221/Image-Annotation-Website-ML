@@ -63,31 +63,34 @@ function DashboardPage() {
     height: 0,
   });
   const [isDrawing, setIsDrawing] = useState({ active: false, type: 'draw' });
+
+  //refs
   const imageWrapperRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
+  //context data
   const { selections, setCurrentImageIndex, currentImageIndex } = useContext(
     Context
   ) as any;
 
   const onScroll = (e: React.WheelEvent) => {
     // fix this
-    // const delta = e.deltaY * -0.01;
-    // const newScale = pos.scale + delta;
-    // const minScale = 1;
-    // const maxScale = 4;
-    // if (newScale >= minScale && newScale <= maxScale) {
-    //   if (newScale === 1) {
-    //     setPos({ scale: 1, x: 0, y: 0 });
-    //     return;
-    //   }
-    //   const ratio = 1 - newScale / pos.scale;
-    //   setPos({
-    //     scale: newScale,
-    //     x: pos.x + (e.clientX - pos.x) * ratio,
-    //     y: pos.y + (e.clientY - pos.y) * ratio,
-    //   });
-    // }
+    const delta = e.deltaY * -0.01;
+    const newScale = pos.scale + delta;
+    const minScale = 1;
+    const maxScale = 4;
+    if (newScale >= minScale && newScale <= maxScale) {
+      if (newScale === 1) {
+        setPos({ scale: 1, x: 0, y: 0 });
+        return;
+      }
+      const ratio = 1 - newScale / pos.scale;
+      setPos({
+        scale: newScale,
+        x: pos.x + (e.clientX - pos.x) * ratio,
+        y: pos.y + (e.clientY - pos.y) * ratio,
+      });
+    }
   };
 
   const toggleFullscreen = () => setIsFullscreen(prevVal => !prevVal);

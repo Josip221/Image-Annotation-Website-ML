@@ -33,7 +33,6 @@ function SliderItem({ active = false, img, index }: SliderItemProps) {
   const { setCurrentImageIndex } = useContext(Context) as any; //FIX
 
   const handleClick = () => {
-    console.log('current indexcurrent', index);
     setCurrentImageIndex(index);
   };
   return (

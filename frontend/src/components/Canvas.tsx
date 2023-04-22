@@ -4,8 +4,8 @@ import styled from 'styled-components';
 const Wrapper = styled.div`
   position: absolute;
   svg {
-    height: 500px;
-    width: 500px;
+    height: 100%;
+    width: 100%;
   }
 `;
 
@@ -21,24 +21,32 @@ interface CanvasProps {
 
 const Canvas = ({ dots, currentImageRect }: CanvasProps) => {
   return (
-    <Wrapper>
-      <svg
-        style={{
-          top: currentImageRect.top,
-          left: currentImageRect.left,
-          width: `${currentImageRect.width}px`,
-          height: `${currentImageRect.height}px`,
-        }}
-      >
+    <Wrapper
+      style={{
+        top: currentImageRect.top,
+        left: currentImageRect.left,
+        width: `${currentImageRect.width}px`,
+        height: `${currentImageRect.height}px`,
+      }}
+    >
+      <svg>
         {dots &&
           dots.map((dot, i) => {
             return (
               <line
                 key={i}
-                x1={dots[i].x}
-                y1={dots[i].y}
-                x2={dots[i + 1] ? dots[i + 1].x : dots[0].x}
-                y2={dots[i + 1] ? dots[i + 1].y : dots[0].y}
+                x1={dots[i].x - currentImageRect.left}
+                y1={dots[i].y - currentImageRect.top}
+                x2={
+                  dots[i + 1]
+                    ? dots[i + 1].x - currentImageRect.left
+                    : dots[0].x - currentImageRect.left
+                }
+                y2={
+                  dots[i + 1]
+                    ? dots[i + 1].y - currentImageRect.top
+                    : dots[0].y - currentImageRect.top
+                }
                 stroke="red"
                 strokeWidth="2"
               />
