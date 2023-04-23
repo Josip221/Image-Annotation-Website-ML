@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useContext,
+  useCallback,
+} from 'react';
 import styled from 'styled-components';
 import { imgUrls } from '../networking/mockupImgs';
 import { getAllCoordsOfRectangle } from '../label_processing/label_processing';
@@ -170,7 +176,7 @@ function DashboardPage() {
         height: rect.height,
       });
     }
-  }, [isFullscreen, setCurrentImageRect]);
+  }, [isFullscreen, setCurrentImageRect, currentImageIndex]);
 
   return (
     <Wrapper>

@@ -38,11 +38,11 @@ const ContextProvider = ({ children }: any) => {
 
   const [selections, setSelections] = useState([]);
 
-  const addNewSelection = () => {};
+  // const addNewSelection = () => {};
 
-  const deleteSelection = () => {};
+  // const deleteSelection = () => {};
 
-  const clearAll = () => {};
+  // const clearAll = () => {};
   return (
     <Context.Provider
       value={{
