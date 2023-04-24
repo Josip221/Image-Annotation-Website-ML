@@ -73,7 +73,7 @@ function DashboardPage() {
   //context data
   const {
     selections,
-    setSelections,
+    addNewSelection,
     setCurrentImageIndex,
     currentImageIndex,
     currentImageRect,
@@ -145,20 +145,13 @@ function DashboardPage() {
   const handleMouseUp = (event: React.MouseEvent): void => {
     event.preventDefault();
     setIsDrawing(prev => ({ type: prev.type, active: false }));
-    setSelections((prevItems: any) => [
-      ...prevItems,
-      {
-        imageId: currentImageIndex,
-        selection: {
-          selectionId: 0,
-          dots: getAllCoordsOfRectangle(
-            startCoords,
-            endCoords,
-            currentImageRect
-          ),
-        },
+    addNewSelection({
+      imageId: currentImageIndex,
+      selection: {
+        selectionId: 0,
+        dots: getAllCoordsOfRectangle(startCoords, endCoords, currentImageRect),
       },
-    ]);
+    });
   };
 
   const handleMouseLeave = () => {
@@ -180,6 +173,7 @@ function DashboardPage() {
 
   return (
     <Wrapper>
+      <h2>Camera Marjan 12</h2>
       <ImageWrapper
         ref={imageWrapperRef}
         tabIndex={0}

@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
 
+interface Selection {
+  imageId: number;
+  selection: {
+    selectionId: number;
+    dots: { x: number; y: number }[];
+  };
+}
+
 // spagethi code
 interface ContextProps {
   selections: {
     imageId: number;
     selection: { selectionId: number; dots: { x: number; y: number }[] };
   }[];
-  setSelections: any; // fix this too
   currentImageIndex: number;
   currentImageRect: {
     top: number;
@@ -23,6 +30,7 @@ interface ContextProps {
       height: number;
     }>
   >;
+  addNewSelection: (newItem: Selection) => void;
 }
 
 export const Context = React.createContext<ContextProps | null>(null);
@@ -36,9 +44,11 @@ const ContextProvider = ({ children }: any) => {
     height: 0,
   });
 
-  const [selections, setSelections] = useState([]);
+  const [selections, setSelections] = useState<any>([]);
 
-  // const addNewSelection = () => {};
+  const addNewSelection = (newItem: any) => {
+    setSelections((prevItems: any) => [...prevItems, newItem]);
+  };
 
   // const deleteSelection = () => {};
 
@@ -47,7 +57,7 @@ const ContextProvider = ({ children }: any) => {
     <Context.Provider
       value={{
         selections,
-        setSelections,
+        addNewSelection,
         currentImageIndex,
         setCurrentImageIndex,
         currentImageRect,
