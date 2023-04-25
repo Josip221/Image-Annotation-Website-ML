@@ -47,6 +47,9 @@ const ContextProvider = ({ children }: any) => {
   const [selections, setSelections] = useState<any>([]);
 
   const addNewSelection = (newItem: any) => {
+    //first check for merges
+    //if any two selections should merge, merge 2 into 1.
+    //else just make a new singular selection
     setSelections((prevItems: any) => [...prevItems, newItem]);
   };
 
