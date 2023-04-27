@@ -48,10 +48,16 @@ const ContextProvider = ({ children }: any) => {
   const [selections, setSelections] = useState<any>([]);
 
   const addNewSelection = (newItem: any) => {
+    //newItem width cant be 0
+
+    const filteredAllSelections = selections.filter(
+      (el: any) => el.imageId === currentImageIndex
+    );
+
     //first check for merges
     //if any two selections should merge, merge 2 into 1.
     //else just make a new singular selection
-    checkNewPolygon(newItem);
+    checkNewPolygon(newItem, filteredAllSelections);
     setSelections((prevItems: any) => [...prevItems, newItem]);
   };
 

@@ -44,50 +44,13 @@ interface edge {
   [index: number]: [number, number];
 }
 
-let polygons: polygon[] = [
-  [
-    [
-      [0, 0],
-      [20, 0],
-    ],
-    [
-      [20, 0],
-      [20, 20],
-    ],
-    [
-      [20, 20],
-      [0, 20],
-    ],
-    [
-      [0, 20],
-      [0, 0],
-    ],
-  ],
-];
-
-const newPolygonThatShouldBeChecked: polygon = [
-  [
-    [0, 0],
-    [20, 0],
-  ],
-  [
-    [20, 0],
-    [20, 20],
-  ],
-  [
-    [20, 20],
-    [0, 20],
-  ],
-  [
-    [0, 20],
-    [0, 0],
-  ],
-];
-
 // polygons[0][0][0]. First is the polygon. Second is the edge. Thrid is the edge point
 
+// TODO:
+// check if new polgyon is not 0width/height
 // check if new polgyon is inside our encapsulates an existing polgyon...
 
+// paul borke
 const checkIfEdgesIntersect = (a: edge, b: edge) => {
   const x1 = a[0][0];
   const x2 = a[1][0];
@@ -135,15 +98,19 @@ const checkIfEdgesIntersect = (a: edge, b: edge) => {
 //run when new polygon created
 
 //for each polgyon
-export const checkNewPolygon = (newItem: any) => {
-  console.log(newItem);
-  polygons.forEach(polygon => {
-    //for each edge in polygon
-    Object.values(polygon).forEach(edge => {
-      // here check intersection
-      // Object.values(newPolygonThatShouldBeChecked).forEach(newEdge =>
-      //   console.log(checkIfEdgesIntersect(edge, newEdge))
-      // );
-    });
-  });
+export const checkNewPolygon = (newPolygon: any, allPolygons: any) => {
+  console.log(newPolygon.selection.dots);
+  if (allPolygons.length > 0) console.log(allPolygons[0].selection.dots);
+
+  //transform data into edges
+
+  // polygons.forEach(polygon => {
+  //   //for each edge in polygon
+  //   Object.values(polygon).forEach(edge => {
+  //     // here check intersection
+  //     // Object.values(newPolygonThatShouldBeChecked).forEach(newEdge =>
+  //     //   console.log(checkIfEdgesIntersect(edge, newEdge))
+  //     // );
+  //   });
+  // });
 };
