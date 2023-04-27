@@ -13,7 +13,7 @@ interface Selection {
 interface ContextProps {
   selections: {
     imageId: number;
-    selection: { selectionId: number; dots: { x: number; y: number }[] };
+    selection: { selectionId: number; edges: [number, number][][] };
   }[];
   currentImageIndex: number;
   currentImageRect: {
@@ -53,6 +53,8 @@ const ContextProvider = ({ children }: any) => {
     const filteredAllSelections = selections.filter(
       (el: any) => el.imageId === currentImageIndex
     );
+
+    newItem.selection.selectionId = filteredAllSelections.length;
 
     //first check for merges
     //if any two selections should merge, merge 2 into 1.

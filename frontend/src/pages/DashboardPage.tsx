@@ -149,7 +149,11 @@ function DashboardPage() {
       imageId: currentImageIndex,
       selection: {
         selectionId: 0,
-        dots: getAllCoordsOfRectangle(startCoords, endCoords, currentImageRect),
+        edges: getAllCoordsOfRectangle(
+          startCoords,
+          endCoords,
+          currentImageRect
+        ),
       },
     });
   };

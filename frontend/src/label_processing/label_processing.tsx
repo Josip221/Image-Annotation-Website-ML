@@ -15,25 +15,16 @@ export const getAllCoordsOfRectangle = (
   endCoords: Coord,
   imageRect: Rect
 ) => {
-  //top
-  const x1 = {
-    x: startCoords.x - imageRect.left,
-    y: startCoords.y - imageRect.top,
-  };
-  const x2 = {
-    x: endCoords.x - imageRect.left,
-    y: startCoords.y - imageRect.top,
-  };
-  //bottom
-  const x3 = {
-    x: endCoords.x - imageRect.left,
-    y: endCoords.y - imageRect.top,
-  };
-  const x4 = {
-    x: startCoords.x - imageRect.left,
-    y: endCoords.y - imageRect.top,
-  };
-  return [x1, x2, x3, x4];
+  const x1 = [startCoords.x - imageRect.left, startCoords.y - imageRect.top];
+  const x2 = [endCoords.x - imageRect.left, startCoords.y - imageRect.top];
+  const x3 = [endCoords.x - imageRect.left, endCoords.y - imageRect.top];
+  const x4 = [startCoords.x - imageRect.left, endCoords.y - imageRect.top];
+  return [
+    [x1, x2],
+    [x2, x3],
+    [x3, x4],
+    [x4, x1],
+  ];
 };
 
 interface polygon {
@@ -81,6 +72,7 @@ const checkIfEdgesIntersect = (a: edge, b: edge) => {
   // Return a object with the x and y coordinates of the intersection
   let x = x1 + ua * (x2 - x1);
   let y = y1 + ua * (y2 - y1);
+  console.log('intersection at', x, y);
   return { x, y };
 };
 
@@ -97,10 +89,24 @@ const checkIfEdgesIntersect = (a: edge, b: edge) => {
 
 //run when new polygon created
 
+// find top,left,right and bot of a polygon, for checking
+
 //for each polgyon
 export const checkNewPolygon = (newPolygon: any, allPolygons: any) => {
-  console.log(newPolygon.selection.dots);
-  if (allPolygons.length > 0) console.log(allPolygons[0].selection.dots);
+  console.log('the new select', newPolygon.selection.edges);
+  if (allPolygons.length > 0) {
+    Object.values(newPolygon.selection.edges).forEach((newEdge: any) => {
+      allPolygons.forEach((polygon: any) => {
+        polygon.selection.edges.forEach((edge: any) => {
+          checkIfEdgesIntersect(newEdge, edge); // works
+        });
+      });
+    });
+  } else {
+    //its the only polygon there is
+    console.log('lone polygon');
+    return false;
+  }
 
   //transform data into edges
 
