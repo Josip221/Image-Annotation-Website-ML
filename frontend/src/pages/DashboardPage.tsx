@@ -163,8 +163,8 @@ function DashboardPage() {
     if (isFullscreen && imageRef.current) {
       const rect = imageRef.current.getBoundingClientRect();
       setCurrentImageRect({
-        top: rect.y,
-        left: rect.x,
+        top: Math.round(rect.y),
+        left: Math.round(rect.x),
         width: rect.width,
         height: rect.height,
       });

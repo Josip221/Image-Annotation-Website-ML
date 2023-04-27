@@ -16,7 +16,7 @@ const Canvas = () => {
     Context
   ) as any;
 
-  const [currentSelections, setCurrentSelections] = useState<any>(null);
+  const [currentSelections, setCurrentSelections] = useState<any>(null); //fix
 
   useEffect(() => {
     const filter = selections.filter(
@@ -27,7 +27,7 @@ const Canvas = () => {
   }, [selections, currentImageIndex]);
 
   useEffect(() => {
-    //console.log(currentSelections);
+    console.log(currentSelections);
   }, [currentSelections]);
 
   return (

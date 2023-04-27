@@ -1,4 +1,4 @@
-interface Coords {
+interface Coord {
   x: number;
   y: number;
 }
@@ -11,8 +11,8 @@ interface Rect {
 }
 
 export const getAllCoordsOfRectangle = (
-  startCoords: Coords,
-  endCoords: Coords,
+  startCoords: Coord,
+  endCoords: Coord,
   imageRect: Rect
 ) => {
   //top
@@ -36,87 +36,114 @@ export const getAllCoordsOfRectangle = (
   return [x1, x2, x3, x4];
 };
 
-function makePolygon(rectangles) {
-  let points = calcPoints(rectangles);
-  return new Polygon(points);
+interface polygon {
+  [index: number]: edge;
 }
 
-function calcPoints(rectangles) {
-  let ret = [];
+interface edge {
+  [index: number]: [number, number];
+}
 
-  let yCoords = [...new Set(getAllYCoords(rectangles).flat())].sort(
-    (a, b) => a - b
-  );
+let polygons: polygon[] = [
+  [
+    [
+      [0, 0],
+      [20, 0],
+    ],
+    [
+      [20, 0],
+      [20, 20],
+    ],
+    [
+      [20, 20],
+      [0, 20],
+    ],
+    [
+      [0, 20],
+      [0, 0],
+    ],
+  ],
+];
 
-  let previousLeftCoord = 0;
-  let previousRightCoord = 0;
+const newPolygonThatShouldBeChecked: polygon = [
+  [
+    [0, 0],
+    [20, 0],
+  ],
+  [
+    [20, 0],
+    [20, 20],
+  ],
+  [
+    [20, 20],
+    [0, 20],
+  ],
+  [
+    [0, 20],
+    [0, 0],
+  ],
+];
 
-  for (let yCoord of yCoords) {
-    console.log('Considering yCoords ' + yCoord);
-    let minimumXLeftCoord = minXLeftCoord(yCoord, rectangles);
-    let maximumXRightCoord = maxXRightCoord(yCoord, rectangles);
-    console.log('min X: ' + minimumXLeftCoord);
-    console.log('max X: ' + maximumXRightCoord);
+// polygons[0][0][0]. First is the polygon. Second is the edge. Thrid is the edge point
 
-    if (yCoord == yCoords[0]) {
-      ret.push([minimumXLeftCoord, yCoord]);
-      ret.push([maximumXRightCoord, yCoord]);
-    } else {
-      if (minimumXLeftCoord != previousLeftCoord) {
-        ret.unshift([previousLeftCoord, yCoord]);
-        ret.unshift([minimumXLeftCoord, yCoord]);
-      } else {
-        ret.unshift([minimumXLeftCoord, yCoord]);
-      }
+// check if new polgyon is inside our encapsulates an existing polgyon...
 
-      if (maximumXRightCoord != previousRightCoord) {
-        ret.push([previousRightCoord, yCoord]);
-        ret.push([maximumXRightCoord, yCoord]);
-      } else {
-        ret.push([maximumXRightCoord, yCoord]);
-      }
-    }
+const checkIfEdgesIntersect = (a: edge, b: edge) => {
+  const x1 = a[0][0];
+  const x2 = a[1][0];
+  const y1 = a[0][1];
+  const y2 = a[1][1];
 
-    previousLeftCoord = minimumXLeftCoord;
-    previousRightCoord = maximumXRightCoord;
-    console.log(ret);
+  const x3 = b[0][0];
+  const x4 = b[1][0];
+  const y3 = b[0][1];
+  const y4 = b[1][1];
+
+  if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) {
+    return false;
   }
 
-  return ret;
-}
+  const denominator: number = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
 
-function getAllYCoords(rectangles) {
-  let allBottomYCoords = rectangles.map(rectangle => rectangle.bottom.y);
-  let allTopYCoords = rectangles.map(rectangle => rectangle.top.y);
-
-  let allCoords = new Set([...allTopYCoords, ...allBottomYCoords]);
-  return allCoords;
-}
-
-function minXLeftCoord(y, rectangles) {
-  return Math.min(...rectanglesAtY(y, rectangles).map(rect => rect.left.x));
-}
-
-function maxXRightCoord(y, rectangles) {
-  return Math.max(...rectanglesAtY(y, rectangles).map(rect => rect.right.x));
-}
-
-function rectanglesAtY(y, rectangles) {
-  let rectsAtYExcBottomLines = rectsAtYExcBottomLines(y, rectangles);
-
-  if (rectsAtYExcBottomLines.length > 0) {
-    // there are rectangles that are not closing here, so ignore those that are closing.
-    return rectsAtYExcBottomLines;
-  } else {
-    // there are only rectangle bottom lines so we need to consider them.
-    return rectsAtYIncBottomLines(y, rectangles);
+  if (denominator === 0) {
+    return false;
   }
-}
+  let ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
+  let ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
+  // is the intersection along the segments
+  if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
+    return false;
+  }
 
-function rectsAtYExcBottomLines(y, rectangles) {
-  return rectangles.filter(rect => rect.top.y <= y && rect.bottom.y > y);
-}
+  // Return a object with the x and y coordinates of the intersection
+  let x = x1 + ua * (x2 - x1);
+  let y = y1 + ua * (y2 - y1);
+  return { x, y };
+};
 
-function rectsAtYIncBottomLines(y, rectangles) {
-  return rectangles.filter(rect => rect.top.y <= y && rect.bottom.y == y);
-}
+//EDGE IS A CONNECTION BETWEEN TWO
+// VERTEX IS A POINT
+
+//CHECK IF TWO OVERLAP FOR STARTERS
+
+//NEW POLYGON IS CREATED, CHECK ITS EDGES THROUGH ALL OTHER EDGES OF EXISTING POLYGONS
+
+//IF NO INTERSECT, GOOD
+
+//IF INTERSECT, PUT NEW POLYGON INSIDE OF EXISTING ONE, BUT REARANGE THE VERTICES CORRECTLY
+
+//run when new polygon created
+
+//for each polgyon
+export const checkNewPolygon = (newItem: any) => {
+  console.log(newItem);
+  polygons.forEach(polygon => {
+    //for each edge in polygon
+    Object.values(polygon).forEach(edge => {
+      // here check intersection
+      // Object.values(newPolygonThatShouldBeChecked).forEach(newEdge =>
+      //   console.log(checkIfEdgesIntersect(edge, newEdge))
+      // );
+    });
+  });
+};

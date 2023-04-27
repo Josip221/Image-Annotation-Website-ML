@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { checkNewPolygon } from '../label_processing/label_processing';
 
 interface Selection {
   imageId: number;
@@ -50,6 +51,7 @@ const ContextProvider = ({ children }: any) => {
     //first check for merges
     //if any two selections should merge, merge 2 into 1.
     //else just make a new singular selection
+    checkNewPolygon(newItem);
     setSelections((prevItems: any) => [...prevItems, newItem]);
   };
 
