@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context/context';
 
@@ -27,7 +27,7 @@ const Canvas = () => {
   }, [selections, currentImageIndex]);
 
   useEffect(() => {
-    //console.log(currentSelections);
+    console.log(currentSelections);
   }, [currentSelections]);
 
   return (

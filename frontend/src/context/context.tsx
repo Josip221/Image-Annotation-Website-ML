@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { checkNewPolygon } from '../label_processing/label_processing';
+import {
+  checkNewPolygon,
+  mergePolygons,
+} from '../label_processing/label_processing';
 
 interface Selection {
   imageId: number;
   selection: {
     selectionId: number;
-    dots: { x: number; y: number }[];
+    edges: { x: number; y: number }[];
   };
 }
 
@@ -50,6 +53,8 @@ const ContextProvider = ({ children }: any) => {
   const addNewSelection = (newItem: any) => {
     //newItem width cant be 0
 
+    //
+
     const filteredAllSelections = selections.filter(
       (el: any) => el.imageId === currentImageIndex
     );
@@ -59,8 +64,36 @@ const ContextProvider = ({ children }: any) => {
     //first check for merges
     //if any two selections should merge, merge 2 into 1.
     //else just make a new singular selection
-    checkNewPolygon(newItem, filteredAllSelections);
-    setSelections((prevItems: any) => [...prevItems, newItem]);
+
+    const intersection = checkNewPolygon(newItem, filteredAllSelections);
+    if (intersection) {
+      const filteredSelectionById = filteredAllSelections.filter(
+        (el: any) => el.selection.selectionId === intersection.selectionId
+      );
+
+      const updatedSelection = mergePolygons(
+        newItem,
+        filteredSelectionById[0],
+        intersection
+      );
+
+      newItem.selection.edges = updatedSelection;
+      newItem.selection.selectionId =
+        filteredSelectionById[0].selection.selectionId;
+
+      console.log(selections);
+      const prevItems = selections.filter((el: any) => {
+        console.log(el);
+        return (
+          el.selection.selectionId !== intersection.selectionId &&
+          el.imageId !== currentImageIndex
+        );
+      });
+      console.log(prevItems);
+      setSelections([...prevItems, newItem]);
+    } else {
+      setSelections((prevItems: any) => [...prevItems, newItem]);
+    }
   };
 
   // const deleteSelection = () => {};

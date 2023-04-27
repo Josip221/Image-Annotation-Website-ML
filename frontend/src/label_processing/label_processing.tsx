@@ -72,8 +72,7 @@ const checkIfEdgesIntersect = (a: edge, b: edge) => {
   // Return a object with the x and y coordinates of the intersection
   let x = x1 + ua * (x2 - x1);
   let y = y1 + ua * (y2 - y1);
-  console.log('intersection at', x, y);
-  return { x, y };
+  return [x, y];
 };
 
 //EDGE IS A CONNECTION BETWEEN TWO
@@ -91,32 +90,128 @@ const checkIfEdgesIntersect = (a: edge, b: edge) => {
 
 // find top,left,right and bot of a polygon, for checking
 
-//for each polgyon
+//for each polgyon //FIX ANY STUFF CANT BE BOTHERED RN
 export const checkNewPolygon = (newPolygon: any, allPolygons: any) => {
-  console.log('the new select', newPolygon.selection.edges);
+  let intersectionData: any = { selectionId: -1, dots: [] };
+
   if (allPolygons.length > 0) {
-    Object.values(newPolygon.selection.edges).forEach((newEdge: any) => {
+    newPolygon.selection.edges.forEach((newEdge: any) => {
       allPolygons.forEach((polygon: any) => {
         polygon.selection.edges.forEach((edge: any) => {
-          checkIfEdgesIntersect(newEdge, edge); // works
+          const intersectionEdge = checkIfEdgesIntersect(newEdge, edge);
+          if (intersectionEdge) {
+            intersectionData.dots.push(intersectionEdge);
+            intersectionData.selectionId = polygon.selection.selectionId;
+          }
         });
       });
     });
-  } else {
-    //its the only polygon there is
-    console.log('lone polygon');
-    return false;
+  }
+  if (intersectionData.selectionId !== -1) {
+    return intersectionData;
   }
 
-  //transform data into edges
-
-  // polygons.forEach(polygon => {
-  //   //for each edge in polygon
-  //   Object.values(polygon).forEach(edge => {
-  //     // here check intersection
-  //     // Object.values(newPolygonThatShouldBeChecked).forEach(newEdge =>
-  //     //   console.log(checkIfEdgesIntersect(edge, newEdge))
-  //     // );
-  //   });
-  // });
+  return false;
 };
+
+export const mergePolygons = (
+  newPolygon: any,
+  oldPolygon: any,
+  intersection: any
+) => {
+  // console.log(newPolygon.selection.edges);
+  // console.log(oldPolygon.selection.edges);
+  // console.log(intersection);
+
+  const poly1 = oldPolygon.selection.edges.filter(
+    (edge: any, index: number) => {
+      const test1 = isVertexOnEdge(
+        intersection.dots[0][0],
+        intersection.dots[0][1],
+        edge[0][0],
+        edge[0][1],
+        edge[1][0],
+        edge[1][1]
+      );
+
+      const test2 = isVertexOnEdge(
+        intersection.dots[1][0],
+        intersection.dots[1][1],
+        edge[0][0],
+        edge[0][1],
+        edge[1][0],
+        edge[1][1]
+      );
+
+      if (test1 || test2) {
+        return false;
+      } else return true;
+    }
+  );
+
+  const poly2 = newPolygon.selection.edges.filter(
+    (edge: any, index: number) => {
+      const test1 = isVertexOnEdge(
+        intersection.dots[0][0],
+        intersection.dots[0][1],
+        edge[0][0],
+        edge[0][1],
+        edge[1][0],
+        edge[1][1]
+      );
+
+      const test2 = isVertexOnEdge(
+        intersection.dots[1][0],
+        intersection.dots[1][1],
+        edge[0][0],
+        edge[0][1],
+        edge[1][0],
+        edge[1][1]
+      );
+
+      if (test1 || test2) {
+        return false;
+      } else return true;
+    }
+  );
+  return poly1.concat(poly2);
+};
+
+// stackoverflow ty
+function isVertexOnEdge(
+  x: number,
+  y: number,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number
+) {
+  var A = x - x1;
+  var B = y - y1;
+  var C = x2 - x1;
+  var D = y2 - y1;
+
+  var dot = A * C + B * D;
+  var len_sq = C * C + D * D;
+  var param = -1;
+  if (len_sq !== 0)
+    //in case of 0 length line
+    param = dot / len_sq;
+
+  var xx, yy;
+
+  if (param < 0) {
+    xx = x1;
+    yy = y1;
+  } else if (param > 1) {
+    xx = x2;
+    yy = y2;
+  } else {
+    xx = x1 + param * C;
+    yy = y1 + param * D;
+  }
+
+  var dx = x - xx;
+  var dy = y - yy;
+  return Math.sqrt(dx * dx + dy * dy) < 0.1;
+}
