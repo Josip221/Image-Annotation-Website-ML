@@ -89,6 +89,8 @@ const ContextProvider = ({ children }: any) => {
           el.imageId !== currentImageIndex
         );
       });
+
+      //fix this
       console.log(prevItems);
       setSelections([...prevItems, newItem]);
     } else {
