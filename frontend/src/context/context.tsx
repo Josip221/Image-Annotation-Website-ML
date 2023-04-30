@@ -4,38 +4,7 @@ import {
   mergePolygons,
 } from '../label_processing/label_processing';
 
-interface Selection {
-  imageId: number;
-  selection: {
-    selectionId: number;
-    edges: { x: number; y: number }[];
-  };
-}
-
-// spagethi code
-interface ContextProps {
-  selections: {
-    imageId: number;
-    selection: { selectionId: number; edges: [number, number][][] };
-  }[];
-  currentImageIndex: number;
-  currentImageRect: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  };
-  setCurrentImageIndex: React.Dispatch<React.SetStateAction<number>>;
-  setCurrentImageRect: React.Dispatch<
-    React.SetStateAction<{
-      top: number;
-      left: number;
-      width: number;
-      height: number;
-    }>
-  >;
-  addNewSelection: (newItem: Selection) => void;
-}
+import { Selection, ContextProps } from '../@interfaces/interfaces';
 
 export const Context = React.createContext<ContextProps | null>(null);
 
@@ -48,13 +17,13 @@ const ContextProvider = ({ children }: any) => {
     height: 0,
   });
 
-  const [selections, setSelections] = useState<any>([]);
+  const [selections, setSelections] = useState<Selection[]>([]);
 
   const addNewSelection = (newItem: any) => {
     //newItem width cant be 0
 
     //
-
+    console.log('selections object', selections);
     const filteredAllSelections = selections.filter(
       (el: any) => el.imageId === currentImageIndex
     );
@@ -68,7 +37,7 @@ const ContextProvider = ({ children }: any) => {
     const intersection = checkNewPolygon(newItem, filteredAllSelections);
     if (intersection) {
       const filteredSelectionById = filteredAllSelections.filter(
-        (el: any) => el.selection.selectionId === intersection.selectionId
+        (el: Selection) => el.selection.selectionId === intersection.selectionId
       );
 
       const updatedSelection = mergePolygons(
@@ -82,7 +51,7 @@ const ContextProvider = ({ children }: any) => {
         filteredSelectionById[0].selection.selectionId;
 
       console.log(selections);
-      const prevItems = selections.filter((el: any) => {
+      const prevItems = selections.filter((el: Selection) => {
         console.log(el);
         return (
           el.selection.selectionId !== intersection.selectionId &&
@@ -90,11 +59,9 @@ const ContextProvider = ({ children }: any) => {
         );
       });
 
-      //fix this
-      console.log(prevItems);
       setSelections([...prevItems, newItem]);
     } else {
-      setSelections((prevItems: any) => [...prevItems, newItem]);
+      setSelections((prevItems: Selection[]) => [...prevItems, newItem]);
     }
   };
 

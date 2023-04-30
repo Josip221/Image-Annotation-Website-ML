@@ -1,16 +1,11 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useContext,
-  useCallback,
-} from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { imgUrls } from '../networking/mockupImgs';
 import { getAllCoordsOfRectangle } from '../label_processing/label_processing';
 import Slider from '../components/Slider';
 import SelectBox from '../components/SelectBox';
 import Canvas from '../components/Canvas';
+import { ContextProps } from '../@interfaces/interfaces';
 
 import { Context } from '../context/context';
 
@@ -71,14 +66,14 @@ function DashboardPage() {
   const imageRef = useRef<HTMLImageElement>(null);
 
   //context data
+
   const {
-    selections,
     addNewSelection,
     setCurrentImageIndex,
     currentImageIndex,
     currentImageRect,
     setCurrentImageRect,
-  } = useContext(Context) as any; // fix any stuff
+  } = useContext<ContextProps>(Context);
 
   const onScroll = (e: React.WheelEvent) => {
     const delta = e.deltaY * -0.01;

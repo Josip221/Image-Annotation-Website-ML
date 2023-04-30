@@ -1,19 +1,14 @@
+import { ImageRect } from '../@interfaces/interfaces';
+
 interface Coord {
   x: number;
   y: number;
 }
 
-interface Rect {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-}
-
 export const getAllCoordsOfRectangle = (
   startCoords: Coord,
   endCoords: Coord,
-  imageRect: Rect
+  imageRect: ImageRect
 ) => {
   const x1 = [startCoords.x - imageRect.left, startCoords.y - imageRect.top];
   const x2 = [endCoords.x - imageRect.left, startCoords.y - imageRect.top];
@@ -177,7 +172,7 @@ export const mergePolygons = (
   return poly1.concat(poly2);
 };
 
-// stackoverflow ty
+// stackoverflow
 function isVertexOnEdge(
   x: number,
   y: number,
