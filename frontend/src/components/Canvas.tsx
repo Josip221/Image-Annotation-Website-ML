@@ -1,6 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context/context';
+import { Selection, Edge } from '../@interfaces/interfaces';
 
 const Wrapper = styled.div`
   position: absolute;
@@ -16,13 +17,15 @@ const Canvas = () => {
     Context
   ) as any;
 
-  const [currentSelections, setCurrentSelections] = useState<any>(null); //fix
+  const [currentSelections, setCurrentSelections] = useState<Selection[] | []>(
+    []
+  ); //fix
 
   useEffect(() => {
     const filter = selections.filter(
-      (el: any) => el.imageId === currentImageIndex
+      (el: Selection) => el.imageId === currentImageIndex
     );
-    const newSelect = filter.map((item: any) => item.selection);
+    const newSelect = filter.map((item: Selection) => item.selection);
     setCurrentSelections(newSelect);
   }, [selections, currentImageIndex]);
 
@@ -41,10 +44,10 @@ const Canvas = () => {
     >
       {/* drawing is okay i guess */}
       {currentSelections &&
-        currentSelections.map((selection: any, i: number) => {
+        currentSelections.map((item: Selection, i: number) => {
           return (
             <svg key={i}>
-              {selection.edges.map((edge: any, i: number) => {
+              {item.selection.edges.map((edge: Edge, i: number) => {
                 return (
                   <line
                     key={i}

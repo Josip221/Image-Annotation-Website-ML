@@ -1,4 +1,5 @@
 import { ImageRect } from '../@interfaces/interfaces';
+import { Edge } from '../@interfaces/interfaces';
 
 interface Coord {
   x: number;
@@ -9,26 +10,42 @@ export const getAllCoordsOfRectangle = (
   startCoords: Coord,
   endCoords: Coord,
   imageRect: ImageRect
-) => {
-  const x1 = [startCoords.x - imageRect.left, startCoords.y - imageRect.top];
-  const x2 = [endCoords.x - imageRect.left, startCoords.y - imageRect.top];
-  const x3 = [endCoords.x - imageRect.left, endCoords.y - imageRect.top];
-  const x4 = [startCoords.x - imageRect.left, endCoords.y - imageRect.top];
+): Edge[] => {
+  const x1: Coord = {
+    x: startCoords.x - imageRect.left,
+    y: startCoords.y - imageRect.top,
+  };
+  const x2: Coord = {
+    x: endCoords.x - imageRect.left,
+    y: startCoords.y - imageRect.top,
+  };
+  const x3: Coord = {
+    x: endCoords.x - imageRect.left,
+    y: endCoords.y - imageRect.top,
+  };
+  const x4: Coord = {
+    x: startCoords.x - imageRect.left,
+    y: endCoords.y - imageRect.top,
+  };
   return [
-    [x1, x2],
-    [x2, x3],
-    [x3, x4],
-    [x4, x1],
+    [
+      [x1.x, x1.y],
+      [x2.x, x2.y],
+    ],
+    [
+      [x2.x, x2.y],
+      [x3.x, x3.y],
+    ],
+    [
+      [x3.x, x3.y],
+      [x4.x, x4.y],
+    ],
+    [
+      [x4.x, x2.y],
+      [x1.x, x3.y],
+    ],
   ];
 };
-
-interface polygon {
-  [index: number]: edge;
-}
-
-interface edge {
-  [index: number]: [number, number];
-}
 
 // polygons[0][0][0]. First is the polygon. Second is the edge. Thrid is the edge point
 
@@ -37,7 +54,7 @@ interface edge {
 // check if new polgyon is inside our encapsulates an existing polgyon...
 
 // paul borke
-const checkIfEdgesIntersect = (a: edge, b: edge) => {
+const checkIfEdgesIntersect = (a: Edge, b: Edge) => {
   const x1 = a[0][0];
   const x2 = a[1][0];
   const y1 = a[0][1];

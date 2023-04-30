@@ -11,7 +11,7 @@ export interface Selection {
   imageId: number;
   selection: {
     selectionId: number;
-    edges: { x: number; y: number }[];
+    edges: Edge[];
   };
 }
 export interface ImageRect {
@@ -19,4 +19,8 @@ export interface ImageRect {
   left: number;
   width: number;
   height: number;
+}
+
+export interface Edge {
+  [index: number]: [number, number];
 }
