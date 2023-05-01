@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context/context';
-import { Selection, Edge } from '../@interfaces/interfaces';
+import { Selection, Edge, ContextProps } from '../@interfaces/interfaces';
 
 const Wrapper = styled.div`
   position: absolute;
@@ -15,22 +15,22 @@ const Wrapper = styled.div`
 const Canvas = () => {
   const { currentImageRect, selections, currentImageIndex } = useContext(
     Context
-  ) as any;
+  ) as ContextProps;
 
   const [currentSelections, setCurrentSelections] = useState<Selection[] | []>(
     []
-  ); //fix
+  );
 
   useEffect(() => {
     const filter = selections.filter(
       (el: Selection) => el.imageId === currentImageIndex
     );
-    const newSelect = filter.map((item: Selection) => item.selection);
-    setCurrentSelections(newSelect);
+
+    setCurrentSelections(filter);
   }, [selections, currentImageIndex]);
 
   useEffect(() => {
-    console.log(currentSelections);
+    //console.log(currentSelections);
   }, [currentSelections]);
 
   return (

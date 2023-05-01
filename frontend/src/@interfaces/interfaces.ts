@@ -24,3 +24,14 @@ export interface ImageRect {
 export interface Edge {
   [index: number]: [number, number];
 }
+
+export interface Coord {
+  x: number;
+  y: number;
+}
+
+export interface Intersection {
+  selectionId: number;
+  intersectingEdges: Edge[];
+  coord: Coord;
+}

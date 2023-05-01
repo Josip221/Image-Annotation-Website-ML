@@ -1,10 +1,10 @@
 import { ImageRect } from '../@interfaces/interfaces';
-import { Edge } from '../@interfaces/interfaces';
-
-interface Coord {
-  x: number;
-  y: number;
-}
+import {
+  Edge,
+  Selection,
+  Coord,
+  Intersection,
+} from '../@interfaces/interfaces';
 
 export const getAllCoordsOfRectangle = (
   startCoords: Coord,
@@ -54,7 +54,7 @@ export const getAllCoordsOfRectangle = (
 // check if new polgyon is inside our encapsulates an existing polgyon...
 
 // paul borke
-const checkIfEdgesIntersect = (a: Edge, b: Edge) => {
+const checkIfEdgesIntersect = (a: Edge, b: Edge): Coord | false => {
   const x1 = a[0][0];
   const x2 = a[1][0];
   const y1 = a[0][1];
@@ -84,7 +84,7 @@ const checkIfEdgesIntersect = (a: Edge, b: Edge) => {
   // Return a object with the x and y coordinates of the intersection
   let x = x1 + ua * (x2 - x1);
   let y = y1 + ua * (y2 - y1);
-  return [x, y];
+  return { x, y };
 };
 
 //EDGE IS A CONNECTION BETWEEN TWO
@@ -103,17 +103,28 @@ const checkIfEdgesIntersect = (a: Edge, b: Edge) => {
 // find top,left,right and bot of a polygon, for checking
 
 //for each polgyon //FIX ANY STUFF CANT BE BOTHERED RN
-export const checkNewPolygon = (newPolygon: any, allPolygons: any) => {
-  let intersectionData: any = { selectionId: -1, dots: [] };
+export const checkNewPolygon = (
+  newPolygon: Selection,
+  allPolygons: Selection[]
+): Intersection | false => {
+  let intersectionData: Intersection = {
+    selectionId: -1,
+    intersectingEdges: [],
+    coord: { x: -1, y: -1 },
+  };
 
   if (allPolygons.length > 0) {
-    newPolygon.selection.edges.forEach((newEdge: any) => {
-      allPolygons.forEach((polygon: any) => {
-        polygon.selection.edges.forEach((edge: any) => {
-          const intersectionEdge = checkIfEdgesIntersect(newEdge, edge);
-          if (intersectionEdge) {
-            intersectionData.dots.push(intersectionEdge);
+    newPolygon.selection.edges.forEach((newEdge: Edge) => {
+      allPolygons.forEach((polygon: Selection) => {
+        polygon.selection.edges.forEach((edge: Edge) => {
+          const intersectionCoord: Coord | false = checkIfEdgesIntersect(
+            newEdge,
+            edge
+          );
+          if (intersectionCoord) {
+            intersectionData.intersectingEdges.push(newEdge, edge);
             intersectionData.selectionId = polygon.selection.selectionId;
+            intersectionData.coord = intersectionCoord;
           }
         });
       });
@@ -127,65 +138,57 @@ export const checkNewPolygon = (newPolygon: any, allPolygons: any) => {
 };
 
 export const mergePolygons = (
-  newPolygon: any,
-  oldPolygon: any,
-  intersection: any
-) => {
-  // console.log(newPolygon.selection.edges);
-  // console.log(oldPolygon.selection.edges);
-  // console.log(intersection);
+  newPolygon: Selection,
+  oldPolygon: Selection,
+  intersection: Intersection
+): Edge[] => {
+  const poly1 = oldPolygon.selection.edges.filter((edge: Edge) => {
+    const test1 = isVertexOnEdge(
+      intersection.intersectingEdges[0][0][0],
+      intersection.intersectingEdges[0][1][1],
+      edge[0][0],
+      edge[0][1],
+      edge[1][0],
+      edge[1][1]
+    );
 
-  const poly1 = oldPolygon.selection.edges.filter(
-    (edge: any, index: number) => {
-      const test1 = isVertexOnEdge(
-        intersection.dots[0][0],
-        intersection.dots[0][1],
-        edge[0][0],
-        edge[0][1],
-        edge[1][0],
-        edge[1][1]
-      );
+    const test2 = isVertexOnEdge(
+      intersection.intersectingEdges[1][0][0],
+      intersection.intersectingEdges[1][1][1],
+      edge[0][0],
+      edge[0][1],
+      edge[1][0],
+      edge[1][1]
+    );
 
-      const test2 = isVertexOnEdge(
-        intersection.dots[1][0],
-        intersection.dots[1][1],
-        edge[0][0],
-        edge[0][1],
-        edge[1][0],
-        edge[1][1]
-      );
+    if (test1 || test2) {
+      return false;
+    } else return true;
+  });
 
-      if (test1 || test2) {
-        return false;
-      } else return true;
-    }
-  );
+  const poly2 = newPolygon.selection.edges.filter((edge: Edge) => {
+    const test1 = isVertexOnEdge(
+      intersection.intersectingEdges[0][0][0],
+      intersection.intersectingEdges[0][1][1],
+      edge[0][0],
+      edge[0][1],
+      edge[1][0],
+      edge[1][1]
+    );
 
-  const poly2 = newPolygon.selection.edges.filter(
-    (edge: any, index: number) => {
-      const test1 = isVertexOnEdge(
-        intersection.dots[0][0],
-        intersection.dots[0][1],
-        edge[0][0],
-        edge[0][1],
-        edge[1][0],
-        edge[1][1]
-      );
+    const test2 = isVertexOnEdge(
+      intersection.intersectingEdges[1][0][0],
+      intersection.intersectingEdges[1][1][1],
+      edge[0][0],
+      edge[0][1],
+      edge[1][0],
+      edge[1][1]
+    );
 
-      const test2 = isVertexOnEdge(
-        intersection.dots[1][0],
-        intersection.dots[1][1],
-        edge[0][0],
-        edge[0][1],
-        edge[1][0],
-        edge[1][1]
-      );
-
-      if (test1 || test2) {
-        return false;
-      } else return true;
-    }
-  );
+    if (test1 || test2) {
+      return false;
+    } else return true;
+  });
   return poly1.concat(poly2);
 };
 
@@ -197,7 +200,7 @@ function isVertexOnEdge(
   y1: number,
   x2: number,
   y2: number
-) {
+): boolean {
   var A = x - x1;
   var B = y - y1;
   var C = x2 - x1;
@@ -227,3 +230,12 @@ function isVertexOnEdge(
   var dy = y - yy;
   return Math.sqrt(dx * dx + dy * dy) < 0.1;
 }
+
+// case 1: new selection contains previous rectangle
+
+// case 2: one vertex inside existing rectangles: check all 4 sides, top left, top right, bottom left, bottom right
+// case 3: one vertex inside existing rectangles: check all 4 sides, top left, top right, bottom left, bottom right
+// case 4: one vertex inside existing rectangles: check all 4 sides, top left, top right, bottom left, bottom right
+// case 5: new selection contains a previous select inside
+
+// deletion as well

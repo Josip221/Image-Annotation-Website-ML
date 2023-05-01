@@ -4,7 +4,11 @@ import {
   mergePolygons,
 } from '../label_processing/label_processing';
 
-import { Selection, ContextProps } from '../@interfaces/interfaces';
+import {
+  Selection,
+  ContextProps,
+  Intersection,
+} from '../@interfaces/interfaces';
 
 export const Context = React.createContext<ContextProps | null>(null);
 
@@ -19,49 +23,52 @@ const ContextProvider = ({ children }: any) => {
 
   const [selections, setSelections] = useState<Selection[]>([]);
 
-  const addNewSelection = (newItem: any) => {
-    //newItem width cant be 0
+  const addNewSelection = (newSelection: Selection) => {
+    //newSelection width cant be 0
 
     //
-    console.log('selections object', selections);
-    const filteredAllSelections = selections.filter(
-      (el: any) => el.imageId === currentImageIndex
+
+    const currentImageSelections = selections.filter(
+      (el: Selection) => el.imageId === currentImageIndex
     );
 
-    newItem.selection.selectionId = filteredAllSelections.length;
+    newSelection.selection.selectionId = currentImageSelections.length;
 
     //first check for merges
     //if any two selections should merge, merge 2 into 1.
     //else just make a new singular selection
 
-    const intersection = checkNewPolygon(newItem, filteredAllSelections);
+    const intersection: Intersection | false = checkNewPolygon(
+      newSelection,
+      currentImageSelections
+    );
     if (intersection) {
-      const filteredSelectionById = filteredAllSelections.filter(
+      const intersectedSelection: Selection = currentImageSelections.filter(
         (el: Selection) => el.selection.selectionId === intersection.selectionId
-      );
+      )[0];
 
       const updatedSelection = mergePolygons(
-        newItem,
-        filteredSelectionById[0],
+        newSelection,
+        intersectedSelection,
         intersection
       );
 
-      newItem.selection.edges = updatedSelection;
-      newItem.selection.selectionId =
-        filteredSelectionById[0].selection.selectionId;
+      newSelection.selection.edges = updatedSelection;
+      newSelection.selection.selectionId =
+        intersectedSelection.selection.selectionId;
+      console.log(currentImageSelections);
+      const prevItemWithoutSelectedTarget = currentImageSelections.filter(
+        (el: Selection) => {
+          //console.log(el, currentImageIndex, intersection);
+          return el.selection.selectionId !== intersection.selectionId;
+        }
+      );
 
-      console.log(selections);
-      const prevItems = selections.filter((el: Selection) => {
-        console.log(el);
-        return (
-          el.selection.selectionId !== intersection.selectionId &&
-          el.imageId !== currentImageIndex
-        );
-      });
+      prevItemWithoutSelectedTarget.push(newSelection);
 
-      setSelections([...prevItems, newItem]);
+      setSelections(prevItemWithoutSelectedTarget);
     } else {
-      setSelections((prevItems: Selection[]) => [...prevItems, newItem]);
+      setSelections((prevItems: Selection[]) => [...prevItems, newSelection]);
     }
   };
 
