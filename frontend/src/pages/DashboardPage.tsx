@@ -73,7 +73,7 @@ function DashboardPage() {
     currentImageIndex,
     currentImageRect,
     setCurrentImageRect,
-  } = useContext<ContextProps>(Context);
+  } = useContext(Context) as ContextProps;
 
   const onScroll = (e: React.WheelEvent) => {
     const delta = e.deltaY * -0.01;

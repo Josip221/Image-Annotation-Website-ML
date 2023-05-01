@@ -6,7 +6,7 @@ import {
 
 import { Selection, ContextProps } from '../@interfaces/interfaces';
 
-export const Context = React.createContext<ContextProps | {}>({});
+export const Context = React.createContext<ContextProps | null>(null);
 
 const ContextProvider = ({ children }: any) => {
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
