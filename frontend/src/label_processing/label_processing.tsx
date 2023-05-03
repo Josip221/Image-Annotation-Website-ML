@@ -110,7 +110,7 @@ export const checkNewPolygon = (
   let intersectionData: Intersection = {
     selectionId: -1,
     intersectingEdges: [],
-    coord: { x: -1, y: -1 },
+    coord: [],
   };
 
   if (allPolygons.length > 0) {
@@ -124,12 +124,14 @@ export const checkNewPolygon = (
           if (intersectionCoord) {
             intersectionData.intersectingEdges.push(newEdge, edge);
             intersectionData.selectionId = polygon.selection.selectionId;
-            intersectionData.coord = intersectionCoord;
+            intersectionData.coord.push(intersectionCoord);
           }
         });
       });
     });
   }
+
+  //console.log(intersectionData);
   if (intersectionData.selectionId !== -1) {
     return intersectionData;
   }
@@ -189,7 +191,89 @@ export const mergePolygons = (
       return false;
     } else return true;
   });
-  return poly1.concat(poly2);
+  const concatPoly = poly1.concat(poly2);
+  const newPoly = sortPointsClockwise(concatPoly);
+
+  console.log(newPoly);
+
+  return newPoly.concat(connectHolesInEdges(newPoly, intersection));
+  //return newPoly;
+};
+
+// sorts edges clockwise
+const sortPointsClockwise = (edges: Edge[]): Edge[] => {
+  // find center
+  const center = edges.reduce(
+    (acc, [p1, p2]: any) => [acc[0] + p1[0] + p2[0], acc[1] + p1[1] + p2[1]],
+    [0, 0]
+  );
+  center[0] /= edges.length * 2;
+  center[1] /= edges.length * 2;
+
+  // Step 2: Calculate the angle of each edge
+  const angles = edges.map((edge: Edge) => {
+    const dx = edge[0][0] - center[0];
+    const dy = edge[1][0] - center[1];
+    return (Math.atan2(dy, dx) * 180) / Math.PI;
+  });
+
+  // Step 3: Sort the edges based on their angle
+  const sortedEdges = edges.slice().sort((a, b) => {
+    const angleA = angles[edges.indexOf(a)];
+    const angleB = angles[edges.indexOf(b)];
+    return angleB - angleA;
+  });
+
+  return sortedEdges;
+};
+
+const connectHolesInEdges = (edges: Edge[], intersection: Intersection) => {
+  const considerationEdges: Edge[] = [];
+  const newEdges: Edge[] = [];
+  //find open edges
+  for (let i = 0; i < edges.length; i++) {
+    //console.log(edges[i]);
+    if (edges[i + 1]) {
+      if (JSON.stringify(edges[i][1]) !== JSON.stringify(edges[i + 1][0])) {
+        considerationEdges.push([edges[i][1], edges[i + 1][0]]);
+      }
+    } else {
+      if (JSON.stringify(edges[i][1]) !== JSON.stringify(edges[0][0])) {
+        considerationEdges.push([edges[i][1], edges[0][0]]);
+      }
+    }
+  }
+
+  console.log(considerationEdges);
+  considerationEdges.forEach(edge => {
+    newEdges.push(...connectThreeDots(intersection, edge[0], edge[1]));
+  });
+
+  return newEdges;
+};
+
+const connectThreeDots = (
+  intersection: Intersection,
+  first: [number, number],
+  second: [number, number]
+): Edge[] => {
+  const newEdgeSection: Edge[] = [];
+  console.log('first and second edges', first, second);
+  console.log(intersection.coord);
+  Object.values(intersection.coord).forEach(interEdge => {
+    if (
+      // ((first[1][1] === interEdge.y || first[1][0] === interEdge.x) &&
+      //   (second[1][1] === interEdge.y || second[1][0] === interEdge.x)) ||
+      // ((first[0][1] === interEdge.y || first[0][0] === interEdge.x) &&
+      //   (second[0][1] === interEdge.y || second[0][0] === interEdge.x))
+      first[0] === interEdge.x ||
+      second[1] === interEdge.y
+    ) {
+      newEdgeSection.push([first, [interEdge.x, interEdge.y]]);
+      newEdgeSection.push([[interEdge.x, interEdge.y], second]);
+    }
+  });
+  return newEdgeSection;
 };
 
 // stackoverflow

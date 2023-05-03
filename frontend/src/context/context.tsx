@@ -56,7 +56,6 @@ const ContextProvider = ({ children }: any) => {
       newSelection.selection.edges = updatedSelection;
       newSelection.selection.selectionId =
         intersectedSelection.selection.selectionId;
-      console.log(currentImageSelections);
       const prevItemWithoutSelectedTarget = currentImageSelections.filter(
         (el: Selection) => {
           //console.log(el, currentImageIndex, intersection);

@@ -33,5 +33,5 @@ export interface Coord {
 export interface Intersection {
   selectionId: number;
   intersectingEdges: Edge[];
-  coord: Coord;
+  coord: Coord[];
 }
