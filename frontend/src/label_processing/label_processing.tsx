@@ -41,8 +41,8 @@ export const getAllCoordsOfRectangle = (
       [x4.x, x4.y],
     ],
     [
-      [x4.x, x2.y],
-      [x1.x, x3.y],
+      [x4.x, x4.y],
+      [x1.x, x1.y],
     ],
   ];
 };
@@ -130,6 +130,7 @@ export const checkNewPolygon = (
       });
     });
   }
+  console.log('how many intersects', intersectionData);
 
   //console.log(intersectionData);
   if (intersectionData.selectionId !== -1) {
@@ -191,13 +192,12 @@ export const mergePolygons = (
       return false;
     } else return true;
   });
+
   const concatPoly = poly1.concat(poly2);
   const newPoly = sortPointsClockwise(concatPoly);
 
   console.log(newPoly);
-
   return newPoly.concat(connectHolesInEdges(newPoly, intersection));
-  //return newPoly;
 };
 
 // sorts edges clockwise
@@ -239,7 +239,7 @@ const connectHolesInEdges = (edges: Edge[], intersection: Intersection) => {
       }
     } else {
       if (JSON.stringify(edges[i][1]) !== JSON.stringify(edges[0][0])) {
-        considerationEdges.push([edges[i][1], edges[0][0]]);
+        //considerationEdges.push([edges[i][1], edges[0][0]]);
       }
     }
   }
@@ -258,21 +258,19 @@ const connectThreeDots = (
   second: [number, number]
 ): Edge[] => {
   const newEdgeSection: Edge[] = [];
-  console.log('first and second edges', first, second);
-  console.log(intersection.coord);
-  Object.values(intersection.coord).forEach(interEdge => {
+  Object.values(intersection.coord).forEach((interEdge, i) => {
+    //push if the angles are 90, meaning they should have an x or y in common
+    console.log(first, second, interEdge);
     if (
-      // ((first[1][1] === interEdge.y || first[1][0] === interEdge.x) &&
-      //   (second[1][1] === interEdge.y || second[1][0] === interEdge.x)) ||
-      // ((first[0][1] === interEdge.y || first[0][0] === interEdge.x) &&
-      //   (second[0][1] === interEdge.y || second[0][0] === interEdge.x))
-      first[0] === interEdge.x ||
-      second[1] === interEdge.y
+      (first[0] === interEdge.x || first[1] === interEdge.y) &&
+      (second[0] === interEdge.x || second[1] === interEdge.y)
     ) {
+      console.log(i);
       newEdgeSection.push([first, [interEdge.x, interEdge.y]]);
       newEdgeSection.push([[interEdge.x, interEdge.y], second]);
     }
   });
+
   return newEdgeSection;
 };
 

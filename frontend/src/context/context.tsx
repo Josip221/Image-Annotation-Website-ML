@@ -67,6 +67,7 @@ const ContextProvider = ({ children }: any) => {
 
       setSelections(prevItemWithoutSelectedTarget);
     } else {
+      console.log(newSelection);
       setSelections((prevItems: Selection[]) => [...prevItems, newSelection]);
     }
   };
@@ -91,3 +92,5 @@ const ContextProvider = ({ children }: any) => {
 };
 
 export default ContextProvider;
+
+//provjeri set seleciton, nesto je obrnuto na [i +1], [0] checku
