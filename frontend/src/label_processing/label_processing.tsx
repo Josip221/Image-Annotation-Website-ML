@@ -46,7 +46,7 @@ export const getAllCoordsOfRectangle = (
     ],
   ];
 };
-
+// TODO:
 // polygons[0][0][0]. First is the polygon. Second is the edge. Thrid is the edge point
 
 // TODO:
