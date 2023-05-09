@@ -200,7 +200,7 @@ export const mergePolygons = (
 };
 
 // sorts edges clockwise
-const sortPointsClockwise = (edges: Edge[]): Edge[] => {
+export const sortPointsClockwise = (edges: Edge[]): Edge[] => {
   // find center
   const center = edges.reduce(
     (acc, [p1, p2]: any) => [acc[0] + p1[0] + p2[0], acc[1] + p1[1] + p2[1]],
@@ -227,24 +227,22 @@ const sortPointsClockwise = (edges: Edge[]): Edge[] => {
 };
 
 const connectHolesInEdges = (edges: Edge[], intersection: Intersection) => {
-  const considerationEdges: Edge[] = [];
+  const openEdges: Edge[] = [];
   const newEdges: Edge[] = [];
   //find open edges
   for (let i = 0; i < edges.length; i++) {
     //console.log(edges[i]);
     if (edges[i + 1]) {
       if (JSON.stringify(edges[i][1]) !== JSON.stringify(edges[i + 1][0])) {
-        considerationEdges.push([edges[i][1], edges[i + 1][0]]);
+        openEdges.push([edges[i][1], edges[i + 1][0]]);
       }
     } else {
       if (JSON.stringify(edges[i][1]) !== JSON.stringify(edges[0][0])) {
-        //considerationEdges.push([edges[i][1], edges[0][0]]);
+        openEdges.push([edges[i][1], edges[0][0]]);
       }
     }
   }
-
-  console.log(considerationEdges);
-  considerationEdges.forEach(edge => {
+  openEdges.forEach(edge => {
     newEdges.push(...connectThreeDots(intersection, edge[0], edge[1]));
   });
 
@@ -259,12 +257,10 @@ const connectThreeDots = (
   const newEdgeSection: Edge[] = [];
   Object.values(intersection.coord).forEach((interEdge, i) => {
     //push if the angles are 90, meaning they should have an x or y in common
-    console.log(first, second, interEdge);
     if (
-      (first[0] === interEdge.x || first[1] === interEdge.y) &&
-      (second[0] === interEdge.x || second[1] === interEdge.y)
+      (first[0] === interEdge.x && second[1] === interEdge.y) ||
+      (second[0] === interEdge.x && first[1] === interEdge.y)
     ) {
-      console.log(i);
       newEdgeSection.push([first, [interEdge.x, interEdge.y]]);
       newEdgeSection.push([[interEdge.x, interEdge.y], second]);
     }
