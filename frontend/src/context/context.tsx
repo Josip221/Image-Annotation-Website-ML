@@ -56,10 +56,14 @@ const ContextProvider = ({ children }: any) => {
       newSelection.selection.edges = updatedSelection;
       newSelection.selection.selectionId =
         intersectedSelection.selection.selectionId;
-      const prevItemWithoutSelectedTarget = currentImageSelections.filter(
+      const prevItemWithoutSelectedTarget = selections.filter(
         (el: Selection) => {
-          //console.log(el, currentImageIndex, intersection);
-          return el.selection.selectionId !== intersection.selectionId;
+          if (el.imageId === intersection.imageId) {
+            if (el.selection.selectionId === intersection.selectionId) {
+              return false;
+            }
+          }
+          return true;
         }
       );
 

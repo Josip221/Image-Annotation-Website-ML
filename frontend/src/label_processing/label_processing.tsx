@@ -108,6 +108,7 @@ export const checkNewPolygon = (
   allPolygons: Selection[]
 ): Intersection | false => {
   let intersectionData: Intersection = {
+    imageId: -1,
     selectionId: -1,
     intersectingEdges: [],
     coord: [],
@@ -125,14 +126,12 @@ export const checkNewPolygon = (
             intersectionData.intersectingEdges.push(newEdge, edge);
             intersectionData.selectionId = polygon.selection.selectionId;
             intersectionData.coord.push(intersectionCoord);
+            intersectionData.imageId = newPolygon.imageId;
           }
         });
       });
     });
   }
-  console.log('how many intersects', intersectionData);
-
-  //console.log(intersectionData);
   if (intersectionData.selectionId !== -1) {
     return intersectionData;
   }
@@ -313,6 +312,7 @@ function isVertexOnEdge(
   return Math.sqrt(dx * dx + dy * dy) < 0.1;
 }
 
+//pain
 // case 1: new selection contains previous rectangle
 
 // case 2: one vertex inside existing rectangles: check all 4 sides, top left, top right, bottom left, bottom right
