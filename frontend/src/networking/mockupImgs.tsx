@@ -3,7 +3,7 @@ export const imgUrls = [
     img: 'https://ec.europa.eu/research-and-innovation/sites/default/files/hm/field/image/wildfire-1826204_1280.jpg',
   },
   {
-    img: 'https://rare-gallery.com/uploads/posts/562818-burning-fire.jpg',
+    img: 'https://www.wallpaperflare.com/static/63/191/734/landscape-smoke-forest-wallpaper.jpg',
   },
   {
     img: 'https://cdn.outsideonline.com/wp-content/uploads/2022/07/wildfire-smoke-effects_h.jpg',

@@ -1,3 +1,4 @@
+import { Console } from 'console';
 import { ImageRect } from '../@interfaces/interfaces';
 import {
   Edge,
@@ -46,12 +47,7 @@ export const getAllCoordsOfRectangle = (
     ],
   ];
 };
-// TODO:
 // polygons[0][0][0]. First is the polygon. Second is the edge. Thrid is the edge point
-
-// TODO:
-// check if new polgyon is not 0width/height
-// check if new polgyon is inside our encapsulates an existing polgyon...
 
 // paul borke
 const checkIfEdgesIntersect = (a: Edge, b: Edge): Coord | false => {
@@ -87,22 +83,6 @@ const checkIfEdgesIntersect = (a: Edge, b: Edge): Coord | false => {
   return { x, y };
 };
 
-//EDGE IS A CONNECTION BETWEEN TWO
-// VERTEX IS A POINT
-
-//CHECK IF TWO OVERLAP FOR STARTERS
-
-//NEW POLYGON IS CREATED, CHECK ITS EDGES THROUGH ALL OTHER EDGES OF EXISTING POLYGONS
-
-//IF NO INTERSECT, GOOD
-
-//IF INTERSECT, PUT NEW POLYGON INSIDE OF EXISTING ONE, BUT REARANGE THE VERTICES CORRECTLY
-
-//run when new polygon created
-
-// find top,left,right and bot of a polygon, for checking
-
-//for each polgyon //FIX ANY STUFF CANT BE BOTHERED RN
 export const checkNewPolygon = (
   newPolygon: Selection,
   allPolygons: Selection[]
@@ -145,112 +125,108 @@ export const mergePolygons = (
   intersection: Intersection
 ): Edge[] => {
   const poly1 = oldPolygon.selection.edges.filter((edge: Edge) => {
-    const test1 = isVertexOnEdge(
-      intersection.intersectingEdges[0][0][0],
-      intersection.intersectingEdges[0][1][1],
-      edge[0][0],
-      edge[0][1],
-      edge[1][0],
-      edge[1][1]
-    );
-
-    const test2 = isVertexOnEdge(
-      intersection.intersectingEdges[1][0][0],
-      intersection.intersectingEdges[1][1][1],
-      edge[0][0],
-      edge[0][1],
-      edge[1][0],
-      edge[1][1]
-    );
-
-    if (test1 || test2) {
+    let test = 0;
+    for (let i = 0; i < intersection.intersectingEdges.length; i++) {
+      if (
+        isVertexOnEdge(
+          intersection.intersectingEdges[i][0][0],
+          intersection.intersectingEdges[i][1][1],
+          edge
+        )
+      )
+        test++;
+    }
+    if (test > 0) {
       return false;
-    } else return true;
+    }
+    return true;
   });
 
   const poly2 = newPolygon.selection.edges.filter((edge: Edge) => {
-    const test1 = isVertexOnEdge(
-      intersection.intersectingEdges[0][0][0],
-      intersection.intersectingEdges[0][1][1],
-      edge[0][0],
-      edge[0][1],
-      edge[1][0],
-      edge[1][1]
-    );
-
-    const test2 = isVertexOnEdge(
-      intersection.intersectingEdges[1][0][0],
-      intersection.intersectingEdges[1][1][1],
-      edge[0][0],
-      edge[0][1],
-      edge[1][0],
-      edge[1][1]
-    );
-
-    if (test1 || test2) {
+    let test = 0;
+    for (let i = 0; i < intersection.intersectingEdges.length; i++) {
+      if (
+        isVertexOnEdge(
+          intersection.intersectingEdges[i][0][0],
+          intersection.intersectingEdges[i][1][1],
+          edge
+        )
+      )
+        test++;
+    }
+    if (test > 0) {
       return false;
-    } else return true;
+    }
+    return true;
   });
 
-  const concatPoly = poly1.concat(poly2);
-  console.log(concatPoly);
-  //sort the original poly so we can find holes
-  const newPoly = sortPointsClockwise(concatPoly);
-  console.log(newPoly);
+  const newPoly = sortPointsClockwise(poly1.concat(poly2));
   const connectionEdges = connectHolesInEdges(newPoly, intersection);
-
-  return newPoly.concat(connectionEdges);
+  console.log(sortPointsClockwise(newPoly));
+  console.log(connectionEdges);
+  return sortPointsClockwise(newPoly.concat(connectionEdges));
 };
 
-// sorts edges clockwise // doesnt work lol
-export const sortPointsClockwise = (edges: Edge[]): Edge[] => {
-  // find center
-  const center = edges.reduce(
-    (acc, [p1, p2]: any) => [acc[0] + p1[0], acc[1] + p1[1]],
-    [0, 0]
-  );
-  center[0] /= edges.length;
-  center[1] /= edges.length;
-  console.log(center);
+export function sortPointsClockwise(edges: Edge[]): Edge[] {
+  // Calculate the center point
+  let centerX = 0;
+  let centerY = 0;
+  const numEdges = edges.length;
 
-  // Step 2: Calculate the angle of each edge
-  const angles = edges.map((edge: Edge) => {
-    const dx = edge[0][0] - center[0];
-    const dy = edge[1][0] - center[1];
-    return (Math.atan2(dy, dx) * 180) / Math.PI;
-  });
+  for (const edge of edges) {
+    for (const point of Object.values(edge)) {
+      centerX += point[0];
+      centerY += point[1];
+    }
+  }
 
-  console.log(angles);
+  centerX /= numEdges * 2;
+  centerY /= numEdges * 2;
 
-  // Step 3: Sort the edges based on their angle
-  const sortedEdges = edges.slice().sort((a, b) => {
-    const angleA = angles[edges.indexOf(a)];
-    const angleB = angles[edges.indexOf(b)];
-    return angleB - angleA;
-  });
-  console.log(edges);
-  console.log(sortedEdges);
+  // Calculate the angles for each edge
+  const angles: { index: number; angle: number }[] = [];
+
+  for (let i = 0; i < edges.length; i++) {
+    const edge = edges[i];
+    const point = Object.values(edge)[0];
+    const xDiff = point[0] - centerX;
+    const yDiff = point[1] - centerY;
+    const angle = Math.atan2(yDiff, xDiff);
+
+    angles.push({ index: i, angle: angle });
+  }
+
+  // Sort the edges based on angles
+  angles.sort((a, b) => a.angle - b.angle);
+
+  // Create a new sorted array
+  const sortedEdges: Edge[] = [];
+
+  for (const angle of angles) {
+    sortedEdges.push(edges[angle.index]);
+  }
+
   return sortedEdges;
-};
+}
 
 const connectHolesInEdges = (edges: Edge[], intersection: Intersection) => {
-  const openEdges: Edge[] = [];
+  const disconnectedPairs: Edge[] = [];
   const newEdges: Edge[] = [];
   //find open edges
   //edges need to be sorted !!
   for (let i = 0; i < edges.length; i++) {
-    //console.log(edges[i]);
     if (edges[i + 1]) {
-      if (JSON.stringify(edges[i][1]) !== JSON.stringify(edges[i + 1][0])) {
-        openEdges.push([edges[i][1], edges[i + 1][0]]);
+      console.log(edges[i][1]);
+      if (edges[i][1] !== edges[i + 1][0]) {
+        disconnectedPairs.push([edges[i][1], edges[i + 1][0]]);
       }
     } else {
-      if (JSON.stringify(edges[i][1]) !== JSON.stringify(edges[0][0])) {
-        openEdges.push([edges[i][1], edges[0][0]]);
+      if (edges[i][1] !== edges[0][0]) {
+        disconnectedPairs.push([edges[i][1], edges[0][0]]);
       }
     }
   }
-  openEdges.forEach(edge => {
+  disconnectedPairs.forEach(edge => {
     newEdges.push(...connectThreeDots(intersection, edge[0], edge[1]));
   });
 
@@ -263,8 +239,7 @@ const connectThreeDots = (
   second: [number, number]
 ): Edge[] => {
   const newEdgeSection: Edge[] = [];
-  Object.values(intersection.coord).forEach((interEdge, i) => {
-    //push if the angles are 90, meaning they should have an x or y in common
+  Object.values(intersection.coord).forEach(interEdge => {
     if (
       (first[0] === interEdge.x && second[1] === interEdge.y) ||
       (second[0] === interEdge.x && first[1] === interEdge.y)
@@ -278,14 +253,9 @@ const connectThreeDots = (
 };
 
 // stackoverflow
-function isVertexOnEdge(
-  x: number,
-  y: number,
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number
-): boolean {
+function isVertexOnEdge(x: number, y: number, edge: Edge): boolean {
+  const [x1, y1] = edge[0];
+  const [x2, y2] = edge[1];
   var A = x - x1;
   var B = y - y1;
   var C = x2 - x1;
@@ -294,9 +264,7 @@ function isVertexOnEdge(
   var dot = A * C + B * D;
   var len_sq = C * C + D * D;
   var param = -1;
-  if (len_sq !== 0)
-    //in case of 0 length line
-    param = dot / len_sq;
+  if (len_sq !== 0) param = dot / len_sq;
 
   var xx, yy;
 
