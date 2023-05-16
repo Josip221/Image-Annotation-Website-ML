@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
 
+import { useAuth } from '../context/auth';
+
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -13,6 +15,8 @@ const Wrapper = styled.div`
 `;
 
 function LoginPage() {
+  const { user, login }: any = useAuth();
+  console.log(login);
   let username: string, password: string;
   const onChangeUsername = (value: string) => {
     username = value;
@@ -25,6 +29,7 @@ function LoginPage() {
   const onSubmit = () => {
     console.log(`Entered username: ${username}, password ${password}`);
     //empty inputs
+    login('bobo2');
   };
 
   return (

@@ -25,18 +25,11 @@ const ContextProvider = ({ children }: any) => {
 
   const addNewSelection = (newSelection: Selection) => {
     //newSelection width cant be 0
-
-    //
-
     const currentImageSelections = selections.filter(
       (el: Selection) => el.imageId === currentImageIndex
     );
 
     newSelection.selection.selectionId = currentImageSelections.length;
-
-    //first check for merges
-    //if any two selections should merge, merge 2 into 1.
-    //else just make a new singular selection
 
     const intersection: Intersection | false = checkNewPolygon(
       newSelection,
@@ -71,7 +64,6 @@ const ContextProvider = ({ children }: any) => {
 
       setSelections(prevItemWithoutSelectedTarget);
     } else {
-      console.log(newSelection);
       setSelections((prevItems: Selection[]) => [...prevItems, newSelection]);
     }
   };
@@ -96,5 +88,3 @@ const ContextProvider = ({ children }: any) => {
 };
 
 export default ContextProvider;
-
-//provjeri set seleciton, nesto je obrnuto na [i +1], [0] checku

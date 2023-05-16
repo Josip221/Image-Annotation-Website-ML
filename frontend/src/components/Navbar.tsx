@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Outlet, Link } from 'react-router-dom';
+import AuthContextProvider from '../context/auth';
+import { useAuth } from '../context/auth';
 
 const NavBar = styled.div`
   display: flex;
@@ -37,24 +39,36 @@ const Wrapper = styled.div`
 `;
 
 function Navbar() {
+  const { user, logOut }: any = useAuth();
+  console.log(user);
   return (
     <Wrapper>
       <NavBar>
-        <Link className="link" to={'/home'}>
-          Home
-        </Link>
-        <Link className="link push-right" to="/dashboard">
-          Dashboard
-        </Link>
-        <Link className="link" to="/register">
-          Sign in
-        </Link>
-        <Link className="link" to="/login">
-          Sign up
-        </Link>
+        {!user && (
+          <>
+            <Link className="link push-right" to={'/home'}>
+              Home
+            </Link>
+            <Link className="link" to="/register">
+              Sign in
+            </Link>
+            <Link className="link" to="/login">
+              Sign up
+            </Link>
+          </>
+        )}
+        {user && (
+          <>
+            <Link className="link push-right" to={'/home'}>
+              Home
+            </Link>
+            <Link onClick={() => logOut()} className="link" to="/login">
+              Log out
+            </Link>
+          </>
+        )}
       </NavBar>
       <Outlet />
-      {/* <Footer>Footer</Footer> */}
     </Wrapper>
   );
 }

@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-//pages
-import HomePage from './pages/HomePage';
 import ErrorPage from './pages/ErrorPage';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
@@ -14,19 +12,26 @@ import { theme } from './globalStyles.js';
 import { ThemeProvider } from 'styled-components';
 import ContextProvider from './context/context';
 
+import ProtectedRoute from './components/ProtectedRoute';
+import AuthContextProvider from './context/auth';
+
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Navbar />,
+    element: (
+      <AuthContextProvider>
+        <Navbar />
+      </AuthContextProvider>
+    ),
     errorElement: <ErrorPage />,
     children: [
       {
         path: '/home',
-        element: <HomePage />,
-      },
-      {
-        path: '/dashboard',
-        element: <DashboardPage />,
+        element: (
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/login',

@@ -1,11 +1,12 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context/context';
+import { SliderItemProps } from '../@interfaces/other';
+import { ContextProps } from '../@interfaces/interfaces';
 
 const Wrapper = styled.div`
   .slider-item {
     &:hover {
-      background-color: ${props => props.theme.colors.second};
       cursor: pointer;
     }
     width: 100%;
@@ -23,14 +24,8 @@ const Wrapper = styled.div`
   }
 `;
 
-interface SliderItemProps {
-  active?: boolean;
-  img: string;
-  index: number;
-}
-
 function SliderItem({ active = false, img, index }: SliderItemProps) {
-  const { setCurrentImageIndex } = useContext(Context) as any; //FIX
+  const { setCurrentImageIndex } = useContext(Context) as ContextProps;
 
   const handleClick = () => {
     setCurrentImageIndex(index);

@@ -9,11 +9,15 @@ import { ContextProps } from '../@interfaces/interfaces';
 
 import { Context } from '../context/context';
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+`;
 
 const ImageWrapper = styled.div`
-  width: 600px;
-  height: 400px;
+  width: 800px;
   display: flex;
 
   .main-image {

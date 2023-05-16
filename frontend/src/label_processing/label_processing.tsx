@@ -193,21 +193,25 @@ export const mergePolygons = (
   });
 
   const concatPoly = poly1.concat(poly2);
+  console.log(concatPoly);
+  //sort the original poly so we can find holes
   const newPoly = sortPointsClockwise(concatPoly);
-
   console.log(newPoly);
-  return newPoly.concat(connectHolesInEdges(newPoly, intersection));
+  const connectionEdges = connectHolesInEdges(newPoly, intersection);
+
+  return newPoly.concat(connectionEdges);
 };
 
-// sorts edges clockwise
+// sorts edges clockwise // doesnt work lol
 export const sortPointsClockwise = (edges: Edge[]): Edge[] => {
   // find center
   const center = edges.reduce(
-    (acc, [p1, p2]: any) => [acc[0] + p1[0] + p2[0], acc[1] + p1[1] + p2[1]],
+    (acc, [p1, p2]: any) => [acc[0] + p1[0], acc[1] + p1[1]],
     [0, 0]
   );
-  center[0] /= edges.length * 2;
-  center[1] /= edges.length * 2;
+  center[0] /= edges.length;
+  center[1] /= edges.length;
+  console.log(center);
 
   // Step 2: Calculate the angle of each edge
   const angles = edges.map((edge: Edge) => {
@@ -216,13 +220,16 @@ export const sortPointsClockwise = (edges: Edge[]): Edge[] => {
     return (Math.atan2(dy, dx) * 180) / Math.PI;
   });
 
+  console.log(angles);
+
   // Step 3: Sort the edges based on their angle
   const sortedEdges = edges.slice().sort((a, b) => {
     const angleA = angles[edges.indexOf(a)];
     const angleB = angles[edges.indexOf(b)];
     return angleB - angleA;
   });
-
+  console.log(edges);
+  console.log(sortedEdges);
   return sortedEdges;
 };
 
@@ -230,6 +237,7 @@ const connectHolesInEdges = (edges: Edge[], intersection: Intersection) => {
   const openEdges: Edge[] = [];
   const newEdges: Edge[] = [];
   //find open edges
+  //edges need to be sorted !!
   for (let i = 0; i < edges.length; i++) {
     //console.log(edges[i]);
     if (edges[i + 1]) {
