@@ -50,7 +50,7 @@ const ImageWrapper = styled.div`
 
   .selection-box {
     position: absolute;
-    cursor: pointer;
+    cursor: crosshair;
     z-index: 1;
   }
 `;

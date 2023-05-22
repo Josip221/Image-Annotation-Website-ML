@@ -90,7 +90,6 @@ export const checkNewPolygon = (
   let intersectionData: Intersection = {
     imageId: -1,
     selectionId: -1,
-    intersectingEdges: [],
     coord: [],
   };
 
@@ -103,7 +102,14 @@ export const checkNewPolygon = (
             edge
           );
           if (intersectionCoord) {
-            intersectionData.intersectingEdges.push(newEdge, edge);
+            polygon.selection.edges.splice(
+              polygon.selection.edges.indexOf(edge),
+              1
+            );
+            newPolygon.selection.edges.splice(
+              newPolygon.selection.edges.indexOf(newEdge),
+              1
+            );
             intersectionData.selectionId = polygon.selection.selectionId;
             intersectionData.coord.push(intersectionCoord);
             intersectionData.imageId = newPolygon.imageId;
@@ -124,49 +130,18 @@ export const mergePolygons = (
   oldPolygon: Selection,
   intersection: Intersection
 ): Edge[] => {
-  const poly1 = oldPolygon.selection.edges.filter((edge: Edge) => {
-    let test = 0;
-    for (let i = 0; i < intersection.intersectingEdges.length; i++) {
-      if (
-        isVertexOnEdge(
-          intersection.intersectingEdges[i][0][0],
-          intersection.intersectingEdges[i][1][1],
-          edge
-        )
-      )
-        test++;
-    }
-    if (test > 0) {
-      return false;
-    }
-    return true;
-  });
+  const poly1 = oldPolygon.selection.edges;
 
-  const poly2 = newPolygon.selection.edges.filter((edge: Edge) => {
-    let test = 0;
-    for (let i = 0; i < intersection.intersectingEdges.length; i++) {
-      if (
-        isVertexOnEdge(
-          intersection.intersectingEdges[i][0][0],
-          intersection.intersectingEdges[i][1][1],
-          edge
-        )
-      )
-        test++;
-    }
-    if (test > 0) {
-      return false;
-    }
-    return true;
-  });
+  const poly2 = newPolygon.selection.edges;
 
   const newPoly = sortPointsClockwise(poly1.concat(poly2));
   const connectionEdges = connectHolesInEdges(newPoly, intersection);
-  console.log(sortPointsClockwise(newPoly));
-  console.log(connectionEdges);
-  return sortPointsClockwise(newPoly.concat(connectionEdges));
+  const final = sortPointsClockwise(newPoly.concat(connectionEdges));
+  checkIfNewShapeIsClosed(final);
+  return final;
 };
 
+//still doesnt work
 export function sortPointsClockwise(edges: Edge[]): Edge[] {
   // Calculate the center point
   let centerX = 0;
@@ -216,7 +191,6 @@ const connectHolesInEdges = (edges: Edge[], intersection: Intersection) => {
   //edges need to be sorted !!
   for (let i = 0; i < edges.length; i++) {
     if (edges[i + 1]) {
-      console.log(edges[i][1]);
       if (edges[i][1] !== edges[i + 1][0]) {
         disconnectedPairs.push([edges[i][1], edges[i + 1][0]]);
       }
@@ -253,43 +227,13 @@ const connectThreeDots = (
 };
 
 // stackoverflow
-function isVertexOnEdge(x: number, y: number, edge: Edge): boolean {
-  const [x1, y1] = edge[0];
-  const [x2, y2] = edge[1];
-  var A = x - x1;
-  var B = y - y1;
-  var C = x2 - x1;
-  var D = y2 - y1;
 
-  var dot = A * C + B * D;
-  var len_sq = C * C + D * D;
-  var param = -1;
-  if (len_sq !== 0) param = dot / len_sq;
-
-  var xx, yy;
-
-  if (param < 0) {
-    xx = x1;
-    yy = y1;
-  } else if (param > 1) {
-    xx = x2;
-    yy = y2;
-  } else {
-    xx = x1 + param * C;
-    yy = y1 + param * D;
-  }
-
-  var dx = x - xx;
-  var dy = y - yy;
-  return Math.sqrt(dx * dx + dy * dy) < 0.1;
-}
+const checkIfNewShapeIsClosed = (edges: Edge[]) => {
+  const openEdges = edges.filter((edge, i) => {
+    if (edges[i + 1]) console.log(edges[i + 1]);
+    if (edges[i + 1]) return edge[1] !== edges[i + 1][0];
+    else return edge[1] !== edges[0][0];
+  });
+};
 
 //pain
-// case 1: new selection contains previous rectangle
-
-// case 2: one vertex inside existing rectangles: check all 4 sides, top left, top right, bottom left, bottom right
-// case 3: one vertex inside existing rectangles: check all 4 sides, top left, top right, bottom left, bottom right
-// case 4: one vertex inside existing rectangles: check all 4 sides, top left, top right, bottom left, bottom right
-// case 5: new selection contains a previous select inside
-
-// deletion as well

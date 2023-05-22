@@ -30,7 +30,7 @@ const Canvas = () => {
   }, [selections, currentImageIndex]);
 
   useEffect(() => {
-    //console.log(currentSelections);
+    console.log(currentSelections);
   }, [currentSelections]);
 
   return (
