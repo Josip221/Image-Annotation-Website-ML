@@ -5,7 +5,7 @@ import { authContextProps } from '../@interfaces/authContext';
 
 function ProtectedRoute({ children }: any) {
   const { user } = useAuth() as authContextProps;
-  console.log(user);
+  //console.log(user);
   if (!user) {
     // user is not authenticated
     return <Navigate to="/login" />;

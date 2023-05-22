@@ -40,7 +40,7 @@ const Wrapper = styled.div`
 
 function Navbar() {
   const { user, logOut }: any = useAuth();
-  console.log(user);
+  //console.log(user);
   return (
     <Wrapper>
       <NavBar>
