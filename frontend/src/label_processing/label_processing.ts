@@ -1,4 +1,4 @@
-import { Console } from 'console';
+
 import { ImageRect } from '../@interfaces/interfaces';
 import {
   Edge,
@@ -225,8 +225,6 @@ const connectThreeDots = (
 
   return newEdgeSection;
 };
-
-// stackoverflow
 
 const checkIfNewShapeIsClosed = (edges: Edge[]) => {
   const openEdges = edges.filter((edge, i) => {

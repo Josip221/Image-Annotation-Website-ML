@@ -176,7 +176,7 @@ function DashboardPage() {
 
   return (
     <Wrapper>
-      <h2>Camera Marjan 12</h2>
+      {!isFullscreen && <h2>Camera Marjan 12</h2>}
       <ImageWrapper
         ref={imageWrapperRef}
         tabIndex={0}
@@ -228,7 +228,7 @@ function DashboardPage() {
           </div>
         )}
       </ImageWrapper>
-      <Slider sliderInfo={imgUrls} />
+      {!isFullscreen && <Slider sliderInfo={imgUrls} />}
     </Wrapper>
   );
 }
