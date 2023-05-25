@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ImageManagerConfig(AppConfig):
+class ManagerConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'image_manager'
+    name = 'manager'
