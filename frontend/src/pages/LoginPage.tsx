@@ -16,7 +16,7 @@ const Wrapper = styled.div`
 
 function LoginPage() {
   const { user, login }: any = useAuth();
-  console.log(login);
+  //console.log(login);
   let username: string, password: string;
   const onChangeUsername = (value: string) => {
     username = value;
