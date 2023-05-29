@@ -8,23 +8,29 @@ import Canvas from '../components/Canvas';
 import { ContextProps } from '../@interfaces/interfaces';
 
 import { Context } from '../context/context';
+import ControlPanel from '../components/ControlPanel';
 
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  align-items: flex-start;
 `;
 
 const ImageWrapper = styled.div`
   width: 800px;
+  margin: 1em;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   .main-image {
     vertical-align: top;
     width: 100%;
     object-fit: contain;
     cursor: pointer;
+    box-shadow: inset 0 -3em 3em rgba(0, 0, 0, 0.1),
+      0 0 0 2px rgb(255, 255, 255), 0.3em 0.3em 1em rgba(0, 0, 0, 0.3);
   }
 
   .container-fullscreen {
@@ -71,6 +77,10 @@ function DashboardPage() {
 
   //context data
 
+  document.addEventListener('keydown', event => {
+    console.log(event.key);
+  });
+
   const {
     addNewSelection,
     setCurrentImageIndex,
@@ -102,7 +112,9 @@ function DashboardPage() {
 
   const handleMainImageClick = (event: React.MouseEvent) => {
     event.preventDefault();
-    if (!isFullscreen) toggleFullscreen();
+
+    if (!isFullscreen && event.target instanceof HTMLImageElement)
+      toggleFullscreen();
   };
 
   const handleKeyClick = (event: React.KeyboardEvent) => {
@@ -163,6 +175,10 @@ function DashboardPage() {
   };
 
   useEffect(() => {
+    console.log('fetch image sequence here');
+  }, []);
+
+  useEffect(() => {
     if (isFullscreen && imageRef.current) {
       const rect = imageRef.current.getBoundingClientRect();
       setCurrentImageRect({
@@ -176,7 +192,6 @@ function DashboardPage() {
 
   return (
     <Wrapper>
-      {!isFullscreen && <h2>Camera Marjan 12</h2>}
       <ImageWrapper
         ref={imageWrapperRef}
         tabIndex={0}
@@ -227,7 +242,9 @@ function DashboardPage() {
             )}
           </div>
         )}
+        <ControlPanel />
       </ImageWrapper>
+
       {!isFullscreen && <Slider sliderInfo={imgUrls} />}
     </Wrapper>
   );

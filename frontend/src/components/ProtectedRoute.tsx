@@ -5,7 +5,7 @@ import { authContextProps } from '../@interfaces/authContext';
 
 function ProtectedRoute({ children }: any) {
   const { token } = useAuth() as authContextProps;
-  //console.log(user);
+
   if (!token) {
     return <Navigate to="/login" />;
   }

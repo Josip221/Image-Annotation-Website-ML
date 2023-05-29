@@ -12,11 +12,14 @@ const Wrapper = styled.div`
   align-items: center;
   flex-direction: column;
   padding: 2em;
+
+  .error {
+    color: red;
+  }
 `;
 
 function LoginPage() {
-  const { user, login }: any = useAuth();
-  //console.log(login);
+  const { login, error }: any = useAuth();
   let username: string, password: string;
   const onChangeUsername = (value: string) => {
     username = value;
@@ -50,6 +53,7 @@ function LoginPage() {
       <div>
         Don't have an account? <Link to="/register">Register</Link>
       </div>
+      {error && <div className="error">{error.message}</div>}
     </Wrapper>
   );
 }

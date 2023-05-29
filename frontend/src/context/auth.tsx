@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authContextProps } from '../@interfaces/authContext';
 import { useLocalStorage } from './useLocalStorage';
@@ -8,6 +8,7 @@ const url = 'http://127.0.0.1:8000/api/';
 
 const AuthContextProvider = ({ children }: any) => {
   const [token, setToken] = useLocalStorage('user', null);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   //login
@@ -24,12 +25,16 @@ const AuthContextProvider = ({ children }: any) => {
         const data = await response.json();
         console.log(data);
         setToken(data.token);
-        setTimeout(() => navigate('/home'), 200);
+        setTimeout(() => {
+          navigate('/home');
+          setError('');
+        }, 200);
       } else {
         throw new Error('Incorrect credentials');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log('error occured: ', error);
+      setError(error);
     }
   };
 
@@ -54,12 +59,16 @@ const AuthContextProvider = ({ children }: any) => {
         const data = await response.json();
         console.log(data);
         setToken(username);
-        navigate('/home');
+        setTimeout(() => {
+          navigate('/home');
+          setError('');
+        }, 200);
       } else {
         throw new Error('Incorrect credentials');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log('error occured: ', error);
+      setError(error);
     }
   };
 
@@ -75,7 +84,7 @@ const AuthContextProvider = ({ children }: any) => {
   //   );
 
   return (
-    <Context.Provider value={{ token, login, logOut }}>
+    <Context.Provider value={{ token, error, register, login, logOut }}>
       {children}
     </Context.Provider>
   );

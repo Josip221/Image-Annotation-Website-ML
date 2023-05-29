@@ -6,12 +6,11 @@ import { ContextProps } from '../@interfaces/interfaces';
 import { SliderProps } from '../@interfaces/other';
 
 const Wrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: center;
+  display: grid;
+  width: 70%;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 0.5em;
-  margin-top: 1em;
+  margin: 1em;
 `;
 
 function Slider({ sliderInfo }: SliderProps) {

@@ -11,6 +11,8 @@ const NavBar = styled.div`
   padding: 1em;
   background-color: ${props => props.theme.colors.second};
   gap: 1em;
+  box-shadow: inset 0 -3em 3em rgba(0, 0, 0, 0.1), 0 0 0 2px rgb(255, 255, 255),
+    0.3em 0.3em 1em rgba(0, 0, 0, 0.3);
 
   .link {
     font-size: 1rem;
@@ -50,17 +52,17 @@ function Navbar() {
               Home
             </Link>
             <Link className="link" to="/register">
-              Sign in
+              Register
             </Link>
             <Link className="link" to="/login">
-              Sign up
+              Log In
             </Link>
           </>
         )}
         {token && (
           <>
             <Link className="link push-right" to={'/home'}>
-              Home
+              Sequence_1234
             </Link>
             <Link onClick={() => logOut()} className="link" to="/login">
               Log out

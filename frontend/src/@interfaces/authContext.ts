@@ -1,5 +1,7 @@
 export interface authContextProps {
-  token: any;
-  login: any;
+  token: string;
+  error: string;
+  register: any;
+  login: (username: string, password: string) => Promise<void>;
   logOut: any;
 }
