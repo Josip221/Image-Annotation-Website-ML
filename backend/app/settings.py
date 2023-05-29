@@ -15,10 +15,9 @@ env = environ.Env()
 environ.Env.read_env()
 from pathlib import Path
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
 
 
 
@@ -38,7 +37,13 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+
+
+
+
+
 INSTALLED_APPS = [
+   
     'rest_framework',
     'rest_framework.authtoken',
     'django.contrib.admin',
@@ -49,22 +54,19 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'manager',
     'knox',
-    'corsheaders',
+     'corsheaders',
+  
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = [
-  'accept',
-  'accept-encoding',
-  'authorization',
-  'content-type',
-  'origin',
-  'dnt',
-  'user-agent',
-  'x-csrftoken',
-  'x-requested-with']
-CORS_ALLOW_METHODS = ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
+ALLOWED_HOSTS = [
+    "127.0.0.1", 
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1", 
+]
+CORS_ALLOW_CREDENTIALS = False
 
 
 
@@ -166,3 +168,6 @@ REST_FRAMEWORK = {
     ]
 }
 
+ALLOWED_HOSTS=['*']
+
+CORS_ORIGIN_ALLOW_ALL = True

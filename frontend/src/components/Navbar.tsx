@@ -39,12 +39,12 @@ const Wrapper = styled.div`
 `;
 
 function Navbar() {
-  const { user, logOut }: any = useAuth();
-  //console.log(user);
+  const { token, logOut }: any = useAuth();
+  //console.log(token);
   return (
     <Wrapper>
       <NavBar>
-        {!user && (
+        {!token && (
           <>
             <Link className="link push-right" to={'/home'}>
               Home
@@ -57,7 +57,7 @@ function Navbar() {
             </Link>
           </>
         )}
-        {user && (
+        {token && (
           <>
             <Link className="link push-right" to={'/home'}>
               Home

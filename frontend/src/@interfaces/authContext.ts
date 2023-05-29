@@ -1,5 +1,5 @@
 export interface authContextProps {
-  user: any;
+  token: any;
   login: any;
   logOut: any;
 }

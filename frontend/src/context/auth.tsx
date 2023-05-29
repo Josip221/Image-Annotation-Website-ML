@@ -4,41 +4,63 @@ import { authContextProps } from '../@interfaces/authContext';
 import { useLocalStorage } from './useLocalStorage';
 export const Context = React.createContext<authContextProps | null>(null);
 
-const url = 'http://127.0.0.1:8000/api';
+const url = 'http://127.0.0.1:8000/api/';
 
 const AuthContextProvider = ({ children }: any) => {
-  const [user, setUser] = useLocalStorage('user', null);
+  const [token, setToken] = useLocalStorage('user', null);
   const navigate = useNavigate();
 
   //login
-  const login = async (name: string) => {
-    const username = 'dina';
-    const email = 'dina@gmail.com';
-    const password = '123';
+  const login = async (username: string, password: string) => {
     try {
-      const response = fetch(`${url}/login/`, {
+      const response = await fetch(`${url}login/`, {
         method: 'POST',
         headers: {
-          Accept: 'application.json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username, password }),
       });
-      console.log(await response);
-      setUser(name);
-      navigate('/home');
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setToken(data.token);
+        setTimeout(() => navigate('/home'), 200);
+      } else {
+        throw new Error('Incorrect credentials');
+      }
     } catch (error) {
-      console.log(error);
+      console.log('error occured: ', error);
     }
   };
 
   const logOut = async () => {
-    setUser(null);
+    setToken(null);
   };
 
-  const register = async (name: string) => {
-    setUser();
-    navigate('/home');
+  const register = async (
+    username: string,
+    email: string,
+    password: string
+  ) => {
+    try {
+      const response = await fetch(`${url}register/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setToken(username);
+        navigate('/home');
+      } else {
+        throw new Error('Incorrect credentials');
+      }
+    } catch (error) {
+      console.log('error occured: ', error);
+    }
   };
 
   //register
@@ -53,7 +75,7 @@ const AuthContextProvider = ({ children }: any) => {
   //   );
 
   return (
-    <Context.Provider value={{ user, login, logOut }}>
+    <Context.Provider value={{ token, login, logOut }}>
       {children}
     </Context.Provider>
   );
