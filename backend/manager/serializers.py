@@ -10,7 +10,6 @@ from .models import Sequence, User
 #     def create(self, validated_data):
 #         return Sequence.objects.create(**validated_data)
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -31,16 +30,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-class EdgeSerializer(serializers.Serializer):
-    start = serializers.ListField(
-        child=serializers.IntegerField())
-    end = serializers.ListField(
-        child=serializers.IntegerField())
-
-
 class SelectionSerializer(serializers.Serializer):
     selectionId = serializers.IntegerField()
-    # edges = serializers.ListField(child=EdgeSerializer())
+    edges = serializers.ListField()
 
 
 class ImageSelectionSerializer(serializers.Serializer):

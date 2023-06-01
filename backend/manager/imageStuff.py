@@ -9,18 +9,28 @@ def makeEmptyMask():
     cv2.imwrite('example.png', image)
 
 
-def makeMask():
+# NEED TO ACCOUNT FOR ASPECT RATIO AND ZOOM LEVEL
+def makeMask(selections, index):
     # maskfile = '%s/mask_%05d-frame-%02d.png' % ("dir", 11, 1)
 
     image = np.zeros((1080, 1920, 3), dtype=np.uint8)
 
-    pts = np.array([[100, 100], [200, 100], [200, 200], [300, 200],
-                    [300, 300], [150, 300], [150, 200]], np.int32)
+    for selection in selections:
+        onlyFirstPositionsOfEdges = []
+        for edge in selection:
+            print(edge)
+            onlyFirstPositionsOfEdges.append(edge[0])
 
-    pts = pts.reshape((-1, 1, 2))
+        pts = np.array(onlyFirstPositionsOfEdges, np.int32)
+        pts = pts.reshape((-1, 1, 2))
+        cv2.fillPoly(image, [pts],  (255, 255, 255))
 
-    cv2.fillPoly(image, [pts],  (255, 255, 255))
+    cv2.imwrite(f"images/test{index}.png", image)
 
-    cv2.imwrite("test.png", image)
 
-    print("Image created")
+def addToExistingMask():
+    return 0
+
+
+def savePng(maskfile, image):
+    cv2.imwrite(maskfile, image)

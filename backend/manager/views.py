@@ -33,6 +33,8 @@ class LoginAPI(KnoxLoginView):
         login(request, user)
         return super(LoginAPI, self).post(request, format=None)
 
+# test view
+
 
 class ProtectedRoute(APIView):
     permission_classes = (permissions.IsAuthenticated,)
@@ -42,21 +44,39 @@ class ProtectedRoute(APIView):
 
 
 class SendMarkedSequence(APIView):
+    # must be logged in
     permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, request):
-        # makeMask()
+
         serializer = DataSerializer(data=request.data)
         # print(request.data)
         if serializer.is_valid():
             selections = serializer.validated_data["selections"]
-            # print(serializer.validated_data)
-            # print(selections)
+            allSelectionsInAnImage = dict()
+            i = 0
             for selection in selections:
                 image_id = selection['imageId']
                 selection_id = selection['selection']['selectionId']
-                print(f"Image ID: {image_id}, Selection ID: {selection_id}")
+                edges = selection["selection"]["edges"]
 
+                if image_id in allSelectionsInAnImage:
+                    allSelectionsInAnImage[image_id].append(edges)
+                else:
+                    allSelectionsInAnImage[image_id] = []
+                    allSelectionsInAnImage[image_id].append(edges)
+                # else:
+                # allSelectionsInAnImage[image_id] = []
+
+                # makeMask(edges, i)
+                # for each selection, array of edges, make a mask for it
+
+                # there can be multiple selections in one image
+                # print(
+                #     f"Image ID: {image_id}, Selection ID: {selection_id}, Edges: {edges}")
+                # i += 1
+            for index in allSelectionsInAnImage:
+                makeMask(allSelectionsInAnImage[index], index)
             return Response({"succes": True, "message": "Sequence sent"})
         else:
             print(serializer.error_messages)

@@ -8,9 +8,11 @@ import { SliderProps } from '../@interfaces/other';
 const Wrapper = styled.div`
   display: grid;
   width: 70%;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
   gap: 0.5em;
   margin: 1em;
+  max-height: 100%;
+  overflow: auto;
 `;
 
 function Slider({ sliderInfo }: SliderProps) {

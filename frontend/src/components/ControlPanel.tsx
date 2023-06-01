@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Button from './Button';
 import styled from 'styled-components';
+import { Context } from '../context/context';
+import { ContextProps } from '../@interfaces/interfaces';
+import { sendMarkedSequence } from '../networking/sequenceControllerNetwork';
+import { useAuth } from '../context/auth';
 
 const Wrapper = styled.div`
   display: flex;
@@ -10,9 +14,17 @@ const Wrapper = styled.div`
 `;
 
 function ControlPanel() {
+  const { selections } = useContext(Context) as ContextProps;
+
+  const { token }: any = useAuth();
+
+  const handleSubmit = () => {
+    console.log(selections);
+    sendMarkedSequence(selections, token);
+  };
   return (
     <Wrapper>
-      <Button>Submit</Button>
+      <Button parentFunction={handleSubmit}>Submit</Button>
       <Button>Next sequence</Button>
     </Wrapper>
   );

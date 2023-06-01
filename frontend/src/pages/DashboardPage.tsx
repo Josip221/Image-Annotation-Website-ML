@@ -77,9 +77,9 @@ function DashboardPage() {
 
   //context data
 
-  document.addEventListener('keydown', event => {
-    console.log(event.key);
-  });
+  // document.addEventListener('keydown', event => {
+  //   console.log(event.key);
+  // });
 
   const {
     addNewSelection,
