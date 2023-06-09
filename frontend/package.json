@@ -10,6 +10,8 @@
     "@types/node": "^16.18.22",
     "@types/react": "^18.0.31",
     "@types/react-dom": "^18.0.11",
+    "geometric": "^2.5.4",
+    "martinez-polygon-clipping": "^0.7.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.9.0",

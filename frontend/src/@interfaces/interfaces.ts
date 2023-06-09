@@ -4,7 +4,7 @@ export interface ContextProps {
   currentImageRect: ImageRect;
   setCurrentImageIndex: React.Dispatch<React.SetStateAction<number>>;
   setCurrentImageRect: React.Dispatch<React.SetStateAction<ImageRect>>;
-  addNewSelection: (newItem: Selection) => void;
+  addNewSelection: (newItem: Selection, action: string) => void;
 }
 
 export interface Selection {

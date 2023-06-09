@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
-import {
-  checkNewPolygon,
-  mergePolygons,
-} from '../label_processing/label_processing';
+import { checkNewPolygon } from '../label_processing/label_processing';
 
-import {
-  Selection,
-  ContextProps,
-  Intersection,
-} from '../@interfaces/interfaces';
+import { Selection, ContextProps } from '../@interfaces/interfaces';
 
 export const Context = React.createContext<ContextProps | null>(null);
 
@@ -23,7 +16,7 @@ const ContextProvider = ({ children }: any) => {
 
   const [selections, setSelections] = useState<Selection[]>([]);
 
-  const addNewSelection = (newSelection: Selection) => {
+  const addNewSelection = (newSelection: Selection, action: string) => {
     //newSelection width cant be 0
     const currentImageSelections = selections.filter(
       (el: Selection) => el.imageId === currentImageIndex
@@ -31,39 +24,13 @@ const ContextProvider = ({ children }: any) => {
 
     newSelection.selection.selectionId = currentImageSelections.length;
 
-    const intersection: Intersection | false = checkNewPolygon(
+    const intersection: number = checkNewPolygon(
       newSelection,
-      currentImageSelections
+      currentImageSelections,
+      action
     );
-    if (intersection) {
-      const intersectedSelection: Selection = currentImageSelections.filter(
-        (el: Selection) => el.selection.selectionId === intersection.selectionId
-      )[0];
 
-      const updatedSelection = mergePolygons(
-        newSelection,
-        intersectedSelection,
-        intersection
-      );
-
-      newSelection.selection.edges = updatedSelection;
-      newSelection.selection.selectionId =
-        intersectedSelection.selection.selectionId;
-      const prevItemWithoutSelectedTarget = selections.filter(
-        (el: Selection) => {
-          if (el.imageId === intersection.imageId) {
-            if (el.selection.selectionId === intersection.selectionId) {
-              return false;
-            }
-          }
-          return true;
-        }
-      );
-
-      prevItemWithoutSelectedTarget.push(newSelection);
-
-      setSelections(prevItemWithoutSelectedTarget);
-    } else {
+    if (intersection === 0) {
       setSelections((prevItems: Selection[]) => [...prevItems, newSelection]);
     }
   };

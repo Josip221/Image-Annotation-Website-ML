@@ -155,18 +155,22 @@ function DashboardPage() {
 
   const handleMouseUp = (event: React.MouseEvent): void => {
     event.preventDefault();
-    setIsDrawing(prev => ({ type: prev.type, active: false }));
-    addNewSelection({
-      imageId: currentImageIndex,
-      selection: {
-        selectionId: 0,
-        edges: getAllCoordsOfRectangle(
-          startCoords,
-          endCoords,
-          currentImageRect
-        ),
+
+    addNewSelection(
+      {
+        imageId: currentImageIndex,
+        selection: {
+          selectionId: 0,
+          edges: getAllCoordsOfRectangle(
+            startCoords,
+            endCoords,
+            currentImageRect
+          ),
+        },
       },
-    });
+      isDrawing.type
+    );
+    setIsDrawing(prev => ({ type: prev.type, active: false }));
   };
 
   const handleMouseLeave = () => {
@@ -175,7 +179,7 @@ function DashboardPage() {
   };
 
   useEffect(() => {
-    console.log('fetch image sequence here');
+    //console.log('fetch image sequence here');
   }, []);
 
   useEffect(() => {

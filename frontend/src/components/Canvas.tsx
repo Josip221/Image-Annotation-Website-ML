@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context/context';
 import { Selection, Edge, ContextProps } from '../@interfaces/interfaces';
@@ -42,7 +42,6 @@ const Canvas = () => {
         height: `${currentImageRect.height}px`,
       }}
     >
-      {/* drawing is okay i guess */}
       {currentSelections &&
         currentSelections.map((item: Selection, i: number) => {
           return (

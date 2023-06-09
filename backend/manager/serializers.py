@@ -1,14 +1,6 @@
 from rest_framework import serializers
-from .models import Sequence, User
+from .models import Sequence, User, ReviewedSequence
 
-
-# class SequenceSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Sequence
-#         fields = '__all__'
-
-#     def create(self, validated_data):
-#         return Sequence.objects.create(**validated_data)
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,6 +22,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
+# selection for submit
 class SelectionSerializer(serializers.Serializer):
     selectionId = serializers.IntegerField()
     edges = serializers.ListField()
@@ -42,3 +35,23 @@ class ImageSelectionSerializer(serializers.Serializer):
 
 class DataSerializer(serializers.Serializer):
     selections = serializers.ListField(child=ImageSelectionSerializer())
+
+
+class SequenceSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        return Sequence.objects.create(**validated_data)
+
+    class Meta:
+        model = Sequence
+        fields = '__all__'
+
+
+class ReviewedSequenceSerializer(serializers.ModelSerializer):
+    # reviewed_at = serializers.DateTimeField()
+
+    def create(self, validated_data):
+        return ReviewedSequence.objects.create(**validated_data)
+
+    class Meta:
+        model = ReviewedSequence
+        fields = "__all__"

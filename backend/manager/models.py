@@ -8,20 +8,29 @@ from rest_framework.authtoken.models import Token
 # Create your models here.
 
 
-
-# @receiver(post_save, sender=settings.AUTH_USER_MODEL)
-# def create_auth_token(sender, instance=None, created=False, **kwargs):
-#     if created:
-#         Token.objects.create(user=instance)
-
 class User(AbstractUser):
     def __str__(self):
         return self.username
-    
+
+
+# pull from db an array(sequence) of images to be reviewed
 class Sequence(models.Model):
     sequence_id = models.CharField(max_length=100)
-    author = models.CharField(max_length=20)
     length = models.IntegerField()
+    review_amount = models.IntegerField()
 
     def __str__(self):
-        return self.sequence_id 
+        return self.id
+
+
+# store reviewed sequence, with its selections
+class ReviewedSequence(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    sequence_id = models.CharField(max_length=100)
+    reviewed_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.id
+
+    class Meta:
+        ordering = ["reviewed_at"]

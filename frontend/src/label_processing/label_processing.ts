@@ -1,12 +1,7 @@
-
 import { ImageRect } from '../@interfaces/interfaces';
-import {
-  Edge,
-  Selection,
-  Coord,
-  Intersection,
-} from '../@interfaces/interfaces';
-
+import { Edge, Selection, Coord } from '../@interfaces/interfaces';
+import * as martinez from 'martinez-polygon-clipping';
+const geometric = require('geometric');
 export const getAllCoordsOfRectangle = (
   startCoords: Coord,
   endCoords: Coord,
@@ -49,189 +44,100 @@ export const getAllCoordsOfRectangle = (
 };
 // polygons[0][0][0]. First is the polygon. Second is the edge. Thrid is the edge point
 
-// paul borke
-const checkIfEdgesIntersect = (a: Edge, b: Edge): Coord | false => {
-  const x1 = a[0][0];
-  const x2 = a[1][0];
-  const y1 = a[0][1];
-  const y2 = a[1][1];
-
-  const x3 = b[0][0];
-  const x4 = b[1][0];
-  const y3 = b[0][1];
-  const y4 = b[1][1];
-
-  if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) {
-    return false;
-  }
-
-  const denominator: number = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
-
-  if (denominator === 0) {
-    return false;
-  }
-  let ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
-  let ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
-  // is the intersection along the segments
-  if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
-    return false;
-  }
-
-  // Return a object with the x and y coordinates of the intersection
-  let x = x1 + ua * (x2 - x1);
-  let y = y1 + ua * (y2 - y1);
-  return { x, y };
-};
-
+//allPolyongs are all current image
 export const checkNewPolygon = (
   newPolygon: Selection,
-  allPolygons: Selection[]
-): Intersection | false => {
-  let intersectionData: Intersection = {
-    imageId: -1,
-    selectionId: -1,
-    coord: [],
-  };
-
+  allPolygons: Selection[],
+  action: string
+): number => {
+  let intersection = 0;
   if (allPolygons.length > 0) {
-    newPolygon.selection.edges.forEach((newEdge: Edge) => {
-      allPolygons.forEach((polygon: Selection) => {
-        polygon.selection.edges.forEach((edge: Edge) => {
-          const intersectionCoord: Coord | false = checkIfEdgesIntersect(
-            newEdge,
-            edge
+    const polyB = toVerticesArrayFromMyFormat(newPolygon.selection.edges);
+
+    //geometric check if polygons intersect
+    //works
+
+    allPolygons.forEach((polygon: Selection) => {
+      const polyA = toVerticesArrayFromMyFormat(polygon.selection.edges);
+      const intersects = geometric.polygonIntersectsPolygon(polyA, polyB);
+      if (intersects) {
+        if (action === 'draw') {
+          const martinezZ = martinez.union(
+            fromMyToMartinezFormat(polygon.selection.edges),
+            fromMyToMartinezFormat(newPolygon.selection.edges)
           );
-          if (intersectionCoord) {
-            polygon.selection.edges.splice(
-              polygon.selection.edges.indexOf(edge),
-              1
-            );
-            newPolygon.selection.edges.splice(
-              newPolygon.selection.edges.indexOf(newEdge),
-              1
-            );
-            intersectionData.selectionId = polygon.selection.selectionId;
-            intersectionData.coord.push(intersectionCoord);
-            intersectionData.imageId = newPolygon.imageId;
-          }
-        });
-      });
+          const finalEdges = fromMartinezToMyFormat(martinezZ);
+          polygon.selection.edges = finalEdges;
+          intersection++;
+        } else if (action === 'delete') {
+          const martinezZ = martinez.diff(
+            fromMyToMartinezFormat(polygon.selection.edges),
+            fromMyToMartinezFormat(newPolygon.selection.edges)
+          );
+          const finalEdges = fromMartinezToMyFormat(martinezZ);
+          polygon.selection.edges = finalEdges;
+          intersection++;
+        }
+      }
+      //check if inside one another
+      if (geometric.polygonInPolygon(polyB, polyA)) {
+        intersection--;
+      }
     });
+    return intersection;
   }
-  if (intersectionData.selectionId !== -1) {
-    return intersectionData;
-  }
+  // if (intersectionData.selectionId !== -1) {
+  //   return intersectionData;
+  // }
 
-  return false;
+  return 0;
 };
 
-export const mergePolygons = (
-  newPolygon: Selection,
-  oldPolygon: Selection,
-  intersection: Intersection
-): Edge[] => {
-  const poly1 = oldPolygon.selection.edges;
-
-  const poly2 = newPolygon.selection.edges;
-
-  const newPoly = sortPointsClockwise(poly1.concat(poly2));
-  const connectionEdges = connectHolesInEdges(newPoly, intersection);
-  const final = sortPointsClockwise(newPoly.concat(connectionEdges));
-  checkIfNewShapeIsClosed(final);
-  return final;
+const fromMyToMartinezFormat = (selection: Edge[]): martinez.Geometry => {
+  const map = selection.map(edge => edge[0]);
+  map.push(selection[0][0]);
+  return [[map]];
 };
 
-//still doesnt work
-export function sortPointsClockwise(edges: Edge[]): Edge[] {
-  // Calculate the center point
-  let centerX = 0;
-  let centerY = 0;
-  const numEdges = edges.length;
-
-  for (const edge of edges) {
-    for (const point of Object.values(edge)) {
-      centerX += point[0];
-      centerY += point[1];
-    }
-  }
-
-  centerX /= numEdges * 2;
-  centerY /= numEdges * 2;
-
-  // Calculate the angles for each edge
-  const angles: { index: number; angle: number }[] = [];
-
-  for (let i = 0; i < edges.length; i++) {
-    const edge = edges[i];
-    const point = Object.values(edge)[0];
-    const xDiff = point[0] - centerX;
-    const yDiff = point[1] - centerY;
-    const angle = Math.atan2(yDiff, xDiff);
-
-    angles.push({ index: i, angle: angle });
-  }
-
-  // Sort the edges based on angles
-  angles.sort((a, b) => a.angle - b.angle);
-
-  // Create a new sorted array
-  const sortedEdges: Edge[] = [];
-
-  for (const angle of angles) {
-    sortedEdges.push(edges[angle.index]);
-  }
-
-  return sortedEdges;
-}
-
-const connectHolesInEdges = (edges: Edge[], intersection: Intersection) => {
-  const disconnectedPairs: Edge[] = [];
-  const newEdges: Edge[] = [];
-  //find open edges
-  //edges need to be sorted !!
-  for (let i = 0; i < edges.length; i++) {
-    if (edges[i + 1]) {
-      if (edges[i][1] !== edges[i + 1][0]) {
-        disconnectedPairs.push([edges[i][1], edges[i + 1][0]]);
-      }
+const fromMartinezToMyFormat = (martinezSelection: martinez.Geometry) => {
+  martinezSelection[0][0].pop();
+  let edges: any = [];
+  martinezSelection[0][0].forEach((item, i) => {
+    if (martinezSelection[0][0][i + 1]) {
+      const edge = [item, martinezSelection[0][0][i + 1]];
+      edges.push(edge);
     } else {
-      if (edges[i][1] !== edges[0][0]) {
-        disconnectedPairs.push([edges[i][1], edges[0][0]]);
-      }
-    }
-  }
-  disconnectedPairs.forEach(edge => {
-    newEdges.push(...connectThreeDots(intersection, edge[0], edge[1]));
-  });
-
-  return newEdges;
-};
-
-const connectThreeDots = (
-  intersection: Intersection,
-  first: [number, number],
-  second: [number, number]
-): Edge[] => {
-  const newEdgeSection: Edge[] = [];
-  Object.values(intersection.coord).forEach(interEdge => {
-    if (
-      (first[0] === interEdge.x && second[1] === interEdge.y) ||
-      (second[0] === interEdge.x && first[1] === interEdge.y)
-    ) {
-      newEdgeSection.push([first, [interEdge.x, interEdge.y]]);
-      newEdgeSection.push([[interEdge.x, interEdge.y], second]);
+      const edge = [item, martinezSelection[0][0][0]];
+      edges.push(edge);
     }
   });
 
-  return newEdgeSection;
+  return edges;
 };
 
-const checkIfNewShapeIsClosed = (edges: Edge[]) => {
-  const openEdges = edges.filter((edge, i) => {
-    if (edges[i + 1]) console.log(edges[i + 1]);
-    if (edges[i + 1]) return edge[1] !== edges[i + 1][0];
-    else return edge[1] !== edges[0][0];
-  });
+const toVerticesArrayFromMyFormat = (edges: Edge[]) => {
+  return edges.map(edge => edge[0]);
 };
 
-//pain
+const toMyFormatFromVerticesArray = (edges: Edge[]) => {};
+
+// // console.log(mappy);
+// // console.log(martinez);
+// // console.log([
+// //   [
+// //     [
+// //       [18.5, 89.5],
+// //       [90, -141.5],
+// //       [178.5, -181.5],
+// //       [184, 79.5],
+// //       [18.5, 89.5],
+// //     ],
+// //     [
+// //       [112.5, -108.5],
+// //       [72, 57.5],
+// //       [162, 59.5],
+// //       [158, -132],
+// //       [112.5, -108.5],
+// //     ],
+// //   ],
+// // ]);

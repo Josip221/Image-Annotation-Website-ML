@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import Input from '../components/Input';
@@ -20,6 +19,7 @@ const Wrapper = styled.div`
 
 function LoginPage() {
   const { login, error }: any = useAuth();
+
   let username: string, password: string;
   const onChangeUsername = (value: string) => {
     username = value;

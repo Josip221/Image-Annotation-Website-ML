@@ -18,7 +18,6 @@ def makeMask(selections, index):
     for selection in selections:
         onlyFirstPositionsOfEdges = []
         for edge in selection:
-            print(edge)
             onlyFirstPositionsOfEdges.append(edge[0])
 
         pts = np.array(onlyFirstPositionsOfEdges, np.int32)
