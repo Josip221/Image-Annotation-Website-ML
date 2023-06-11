@@ -49,7 +49,7 @@ export const checkNewPolygon = (
   newPolygon: Selection,
   allPolygons: Selection[],
   action: string
-): number => {
+) => {
   let intersection = 0;
   if (allPolygons.length > 0) {
     const polyB = toVerticesArrayFromMyFormat(newPolygon.selection.edges);
@@ -68,6 +68,7 @@ export const checkNewPolygon = (
           );
           const finalEdges = fromMartinezToMyFormat(martinezZ);
           polygon.selection.edges = finalEdges;
+
           intersection++;
         } else if (action === 'delete') {
           const martinezZ = martinez.diff(
@@ -90,17 +91,13 @@ export const checkNewPolygon = (
           polygon.selection.edges = newPolygon.selection.edges;
         } else if (action === 'delete') {
           console.log('delete it');
-          allPolygons.splice(allPolygons.indexOf(polygon), 1);
+          //allPolygons.splice(allPolygons.indexOf(polygon), 1);
         }
         intersection--;
       }
     });
-    return intersection;
+    if (intersection) return allPolygons;
   }
-  // if (intersectionData.selectionId !== -1) {
-  //   return intersectionData;
-  // }
-
   return 0;
 };
 
@@ -130,25 +127,15 @@ const toVerticesArrayFromMyFormat = (edges: Edge[]) => {
   return edges.map(edge => edge[0]);
 };
 
-const toMyFormatFromVerticesArray = (edges: Edge[]) => {};
-
-// // console.log(mappy);
-// // console.log(martinez);
-// // console.log([
-// //   [
-// //     [
-// //       [18.5, 89.5],
-// //       [90, -141.5],
-// //       [178.5, -181.5],
-// //       [184, 79.5],
-// //       [18.5, 89.5],
-// //     ],
-// //     [
-// //       [112.5, -108.5],
-// //       [72, 57.5],
-// //       [162, 59.5],
-// //       [158, -132],
-// //       [112.5, -108.5],
-// //     ],
-// //   ],
-// // ]);
+export const adjustToScale = (selections: Selection[], scale: number) => {
+  const temp = JSON.parse(JSON.stringify(selections));
+  temp.forEach((selection: Selection) => {
+    selection.selection.edges.forEach((edge: any) => {
+      edge.forEach((number: [number, number]) => {
+        number[0] *= scale;
+        number[1] *= scale;
+      });
+    });
+  });
+  return temp;
+};

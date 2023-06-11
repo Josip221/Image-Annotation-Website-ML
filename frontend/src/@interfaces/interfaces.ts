@@ -7,6 +7,8 @@ export interface ContextProps {
   addNewSelection: (newItem: Selection, action: string) => void;
   fullImageRatioToOg: number;
   setFullImageRatioToOg: React.Dispatch<React.SetStateAction<number>>;
+  fullScreenWidth: number;
+  setFullScreenWidth: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export interface Selection {
