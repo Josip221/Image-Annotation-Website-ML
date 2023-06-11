@@ -6,7 +6,7 @@ import Slider from '../components/Slider';
 import SelectBox from '../components/SelectBox';
 import Canvas from '../components/Canvas';
 import { ContextProps } from '../@interfaces/interfaces';
-
+import { adjustToScale } from '../label_processing/label_processing';
 import { Context } from '../context/context';
 import ControlPanel from '../components/ControlPanel';
 
@@ -27,6 +27,7 @@ const ImageWrapper = styled.div`
   .main-image {
     vertical-align: top;
     width: 100%;
+
     object-fit: contain;
     cursor: pointer;
     box-shadow: inset 0 -3em 3em rgba(0, 0, 0, 0.1),
@@ -64,7 +65,7 @@ const ImageWrapper = styled.div`
 function DashboardPage() {
   const [pos, setPos] = useState({ x: 0, y: 0, scale: 1 });
   const [isFullscreen, setIsFullscreen] = useState(false);
-
+  const [scale, setScale] = useState(0);
   //for select box
   const [startCoords, setStartCoords] = useState({ x: 0, y: 0 });
   const [endCoords, setEndCoords] = useState({ x: 0, y: 0 });
@@ -88,6 +89,8 @@ function DashboardPage() {
     currentImageRect,
     setCurrentImageRect,
     setFullImageRatioToOg,
+    fullScreenWidth,
+    setFullScreenWidth,
   } = useContext(Context) as ContextProps;
 
   const onScroll = (e: React.WheelEvent) => {
@@ -193,16 +196,30 @@ function DashboardPage() {
         height: rect.height,
       });
       //ratio
-      const nheight = imageRef.current?.naturalWidth;
-      const height = imageRef.current?.width;
-      if (nheight && height)
-        setFullImageRatioToOg(+(nheight / height).toFixed(2));
+      const nwidth = imageRef.current?.naturalWidth;
+      const width = imageRef.current?.width;
+      setFullScreenWidth(width);
+      if (nwidth && width) setFullImageRatioToOg(+(nwidth / width).toFixed(2));
+    }
+    if (!isFullscreen && imageRef.current && fullScreenWidth !== 0) {
+      const rect = imageRef.current.getBoundingClientRect();
+      setCurrentImageRect({
+        top: Math.round(rect.y),
+        left: Math.round(rect.x),
+        width: rect.width,
+        height: rect.height,
+      });
+      const width = imageRef.current?.width;
+      if (width) setScale(+(fullScreenWidth / width).toFixed(2));
     }
   }, [
     isFullscreen,
+    fullScreenWidth,
+    setFullScreenWidth,
     setCurrentImageRect,
     currentImageIndex,
     setFullImageRatioToOg,
+    scale,
   ]);
 
   return (
@@ -215,12 +232,20 @@ function DashboardPage() {
         onKeyDown={handleKeyClick}
       >
         {!isFullscreen && (
-          <img
-            ref={imageRef}
-            className="main-image"
-            src={imgUrls[currentImageIndex].img}
-            alt="select smoke"
-          />
+          <>
+            <img
+              ref={imageRef}
+              className="main-image"
+              src={imgUrls[currentImageIndex].img}
+              alt="select smoke"
+            />
+            <Canvas
+              rect={currentImageRect}
+              scale={1 / scale}
+              index={currentImageIndex}
+              strokeWidth={2}
+            />
+          </>
         )}
         {isFullscreen && (
           <div className="container-fullscreen" onWheelCapture={onScroll}>
@@ -247,7 +272,12 @@ function DashboardPage() {
               onMouseLeave={handleMouseLeave}
               onMouseUp={handleMouseUp}
             />
-            <Canvas />
+            <Canvas
+              rect={currentImageRect}
+              scale={1}
+              index={currentImageIndex}
+              strokeWidth={2}
+            />
             {isDrawing.active && (
               <SelectBox
                 type={isDrawing.type}

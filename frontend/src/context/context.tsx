@@ -7,6 +7,7 @@ export const Context = React.createContext<ContextProps | null>(null);
 
 const ContextProvider = ({ children }: any) => {
   const [fullImageRatioToOg, setFullImageRatioToOg] = useState<number>(1);
+  const [fullScreenWidth, setFullScreenWidth] = useState<number>(1);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [currentImageRect, setCurrentImageRect] = useState({
     top: 0,
@@ -18,14 +19,22 @@ const ContextProvider = ({ children }: any) => {
   const [selections, setSelections] = useState<Selection[]>([]);
 
   const addNewSelection = (newSelection: Selection, action: string) => {
-    //newSelection width cant be 0
+    //newSelection width cant be 1x1
+    if (
+      JSON.stringify(newSelection.selection.edges[0]) ===
+      JSON.stringify(newSelection.selection.edges[2])
+    ) {
+      console.log('no empty selects');
+      return 0;
+    }
+
     const currentImageSelections = selections.filter(
       (el: Selection) => el.imageId === currentImageIndex
     );
 
     newSelection.selection.selectionId = currentImageSelections.length;
 
-    const intersection: number = checkNewPolygon(
+    const intersection = checkNewPolygon(
       newSelection,
       currentImageSelections,
       action
@@ -33,6 +42,8 @@ const ContextProvider = ({ children }: any) => {
 
     if (intersection === 0) {
       setSelections((prevItems: Selection[]) => [...prevItems, newSelection]);
+    } else {
+      setSelections((prevItems: Selection[]) => [...prevItems]);
     }
   };
 
@@ -50,6 +61,8 @@ const ContextProvider = ({ children }: any) => {
         setCurrentImageRect,
         fullImageRatioToOg,
         setFullImageRatioToOg,
+        fullScreenWidth,
+        setFullScreenWidth,
       }}
     >
       {children}

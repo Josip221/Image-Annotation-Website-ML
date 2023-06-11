@@ -1,10 +1,17 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext, useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context/context';
-import { Selection, Edge, ContextProps } from '../@interfaces/interfaces';
+import {
+  Selection,
+  Edge,
+  ContextProps,
+  ImageRect,
+} from '../@interfaces/interfaces';
+import { adjustToScale } from '../label_processing/label_processing';
 
 const Wrapper = styled.div`
   position: absolute;
+  pointer-events: none;
   svg {
     position: absolute;
     height: 100%;
@@ -12,28 +19,37 @@ const Wrapper = styled.div`
   }
 `;
 
-const Canvas = () => {
-  const { currentImageRect, selections, currentImageIndex } = useContext(
-    Context
-  ) as ContextProps;
-
+const Canvas = ({
+  rect,
+  scale,
+  index,
+  strokeWidth,
+}: {
+  rect: ImageRect;
+  scale: number;
+  index: number;
+  strokeWidth: number;
+}) => {
+  const { selections } = useContext(Context) as ContextProps;
   const [currentSelections, setCurrentSelections] = useState<Selection[] | []>(
     []
   );
 
   useEffect(() => {
-    setCurrentSelections(
-      selections.filter((el: Selection) => el.imageId === currentImageIndex)
+    const adjustedSelections = adjustToScale(
+      selections.filter((el: Selection) => el.imageId === index),
+      scale
     );
-  }, [selections, currentImageIndex]);
+    setCurrentSelections(adjustedSelections);
+  }, [setCurrentSelections, selections, index, scale]);
 
   return (
     <Wrapper
       style={{
-        top: currentImageRect.top,
-        left: currentImageRect.left,
-        width: `${currentImageRect.width}px`,
-        height: `${currentImageRect.height}px`,
+        top: Math.round(rect.top),
+        left: Math.round(rect.left),
+        width: `${rect.width}px`,
+        height: `${rect.height}px`,
       }}
     >
       {currentSelections &&
@@ -49,7 +65,7 @@ const Canvas = () => {
                     x2={edge[1][0]}
                     y2={edge[1][1]}
                     stroke="red"
-                    strokeWidth="2"
+                    strokeWidth={strokeWidth}
                   />
                 );
               })}
