@@ -6,6 +6,7 @@ import { Selection, ContextProps } from '../@interfaces/interfaces';
 export const Context = React.createContext<ContextProps | null>(null);
 
 const ContextProvider = ({ children }: any) => {
+  const [fullImageRatioToOg, setFullImageRatioToOg] = useState<number>(1);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [currentImageRect, setCurrentImageRect] = useState({
     top: 0,
@@ -35,7 +36,7 @@ const ContextProvider = ({ children }: any) => {
     }
   };
 
-  // const deleteSelection = () => {};
+  // const deleteSelectionForCurrentImage = () => {};
 
   // const clearAll = () => {};
   return (
@@ -47,6 +48,8 @@ const ContextProvider = ({ children }: any) => {
         setCurrentImageIndex,
         currentImageRect,
         setCurrentImageRect,
+        fullImageRatioToOg,
+        setFullImageRatioToOg,
       }}
     >
       {children}

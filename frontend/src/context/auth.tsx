@@ -26,7 +26,7 @@ const AuthContextProvider = ({ children }: any) => {
         console.log(data);
         setToken(data.token);
         setTimeout(() => {
-          navigate('/home');
+          navigate('/');
           setError('');
         }, 200);
       } else {
@@ -60,7 +60,7 @@ const AuthContextProvider = ({ children }: any) => {
         console.log(data);
         setToken(username);
         setTimeout(() => {
-          navigate('/home');
+          navigate('/');
           setError('');
         }, 200);
       } else {

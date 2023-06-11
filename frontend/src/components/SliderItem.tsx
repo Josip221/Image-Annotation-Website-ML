@@ -9,7 +9,7 @@ const Wrapper = styled.div`
     &:hover {
       cursor: pointer;
     }
-
+    position: relative;
     box-sizing: border-box;
     padding: 0.1em;
     width: 100%;
@@ -29,6 +29,7 @@ const Wrapper = styled.div`
     height: 80px;
     vertical-align: top;
     object-fit: 'contain';
+    object-position: top;
   }
 `;
 
@@ -44,7 +45,6 @@ function SliderItem({ active = false, img, index }: SliderItemProps) {
         <img className="slider-photo" alt="idk" src={img} />
         No: {index + 1}
         <div>img_0000.jpg</div>
-        <div>Empty mask: Yes</div>
       </div>
     </Wrapper>
   );

@@ -5,6 +5,8 @@ export interface ContextProps {
   setCurrentImageIndex: React.Dispatch<React.SetStateAction<number>>;
   setCurrentImageRect: React.Dispatch<React.SetStateAction<ImageRect>>;
   addNewSelection: (newItem: Selection, action: string) => void;
+  fullImageRatioToOg: number;
+  setFullImageRatioToOg: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export interface Selection {
@@ -28,10 +30,4 @@ export interface Edge {
 export interface Coord {
   x: number;
   y: number;
-}
-
-export interface Intersection {
-  imageId: number;
-  selectionId: number;
-  coord: Coord[];
 }

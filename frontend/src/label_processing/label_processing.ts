@@ -79,8 +79,19 @@ export const checkNewPolygon = (
           intersection++;
         }
       }
-      //check if inside one another
+      //check if new inside old
       if (geometric.polygonInPolygon(polyB, polyA)) {
+        intersection--;
+      }
+
+      //check if old inside new
+      if (geometric.polygonInPolygon(polyA, polyB)) {
+        if (action === 'draw') {
+          polygon.selection.edges = newPolygon.selection.edges;
+        } else if (action === 'delete') {
+          console.log('delete it');
+          allPolygons.splice(allPolygons.indexOf(polygon), 1);
+        }
         intersection--;
       }
     });

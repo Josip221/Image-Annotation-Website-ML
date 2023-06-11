@@ -87,6 +87,7 @@ function DashboardPage() {
     currentImageIndex,
     currentImageRect,
     setCurrentImageRect,
+    setFullImageRatioToOg,
   } = useContext(Context) as ContextProps;
 
   const onScroll = (e: React.WheelEvent) => {
@@ -191,8 +192,18 @@ function DashboardPage() {
         width: rect.width,
         height: rect.height,
       });
+      //ratio
+      const nheight = imageRef.current?.naturalWidth;
+      const height = imageRef.current?.width;
+      if (nheight && height)
+        setFullImageRatioToOg(+(nheight / height).toFixed(2));
     }
-  }, [isFullscreen, setCurrentImageRect, currentImageIndex]);
+  }, [
+    isFullscreen,
+    setCurrentImageRect,
+    currentImageIndex,
+    setFullImageRatioToOg,
+  ]);
 
   return (
     <Wrapper>
