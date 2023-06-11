@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState, useRef } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context/context';
 import { Selection, Edge, ContextProps } from '../@interfaces/interfaces';
@@ -22,16 +22,10 @@ const Canvas = () => {
   );
 
   useEffect(() => {
-    const filter = selections.filter(
-      (el: Selection) => el.imageId === currentImageIndex
+    setCurrentSelections(
+      selections.filter((el: Selection) => el.imageId === currentImageIndex)
     );
-
-    setCurrentSelections(filter);
   }, [selections, currentImageIndex]);
-
-  useEffect(() => {
-    console.log(currentSelections);
-  }, [currentSelections]);
 
   return (
     <Wrapper

@@ -19,7 +19,7 @@ const Wrapper = styled.div`
       0 0 0 2px rgb(255, 255, 255), 0.3em 0.3em 1em rgba(0, 0, 0, 0.3);
   }
   .slider-item_active {
-    //border: 4px ${props => props.theme.colors.button} solid;
+    border: 1px ${props => props.theme.colors.button} solid;
     background-color: floralwhite;
   }
 
