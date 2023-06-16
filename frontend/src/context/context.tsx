@@ -24,7 +24,6 @@ const ContextProvider = ({ children }: any) => {
       JSON.stringify(newSelection.selection.edges[0]) ===
       JSON.stringify(newSelection.selection.edges[2])
     ) {
-      console.log('no empty selects');
       return 0;
     }
 
