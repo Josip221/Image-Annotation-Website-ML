@@ -6,6 +6,7 @@ import { ContextProps, ImageRect } from '../@interfaces/interfaces';
 import Canvas from './Canvas';
 
 const Wrapper = styled.div`
+  position: relative;
   .slider-item {
     &:hover {
       cursor: pointer;
@@ -67,7 +68,17 @@ function SliderItem({ active = false, img, index }: SliderItemProps) {
     <Wrapper onClick={handleClick}>
       <div className={`slider-item ${active && 'slider-item_active'}`}>
         <img ref={imageRef} className="slider-photo" alt="idk" src={img} />
-        <Canvas rect={rect} scale={scale} index={index} strokeWidth={1} />
+        <Canvas
+          rect={{
+            top: 1,
+            left: 2,
+            width: rect.width,
+            height: rect.height,
+          }}
+          scale={scale}
+          index={index}
+          strokeWidth={1}
+        />
         <div>img_0000.jpg</div>
       </div>
     </Wrapper>

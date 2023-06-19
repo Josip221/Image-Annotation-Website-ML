@@ -9,7 +9,7 @@ def makeEmptyMask():
     cv2.imwrite('example.png', image)
 
 
-# NEED TO ACCOUNT FOR ASPECT RATIO AND ZOOM LEVEL
+# NEED TO ACCOUNT FOR ZOOM LEVEL
 def makeMask(selections, index):
     # maskfile = '%s/mask_%05d-frame-%02d.png' % ("dir", 11, 1)
 
@@ -25,10 +25,6 @@ def makeMask(selections, index):
         cv2.fillPoly(image, [pts],  (255, 255, 255))
 
     cv2.imwrite(f"images/test{index}.png", image)
-
-
-def addToExistingMask():
-    return 0
 
 
 def savePng(maskfile, image):

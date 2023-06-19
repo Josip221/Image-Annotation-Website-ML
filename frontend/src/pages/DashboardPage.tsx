@@ -5,10 +5,14 @@ import { getAllCoordsOfRectangle } from '../label_processing/label_processing';
 import Slider from '../components/Slider';
 import SelectBox from '../components/SelectBox';
 import Canvas from '../components/Canvas';
-import { ContextProps } from '../@interfaces/interfaces';
-import { adjustToScale } from '../label_processing/label_processing';
+import { ContextProps, ImageRect } from '../@interfaces/interfaces';
 import { Context } from '../context/context';
 import ControlPanel from '../components/ControlPanel';
+import {
+  TransformWrapper,
+  TransformComponent,
+  KeepScale,
+} from 'react-zoom-pan-pinch';
 
 const Wrapper = styled.div`
   display: flex;
@@ -58,30 +62,32 @@ const ImageWrapper = styled.div`
   .selection-box {
     position: absolute;
     cursor: crosshair;
-    z-index: 1;
+    z-index: 10;
   }
 `;
 
 function DashboardPage() {
-  const [pos, setPos] = useState({ x: 0, y: 0, scale: 1 });
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [scale, setScale] = useState(0);
+  // const [zoomOffscale, setZoomOffscale] = useState({
+  //   x: 0,
+  //   y: 0,
+  //   scale: 1,
+  // });
   //for select box
   const [startCoords, setStartCoords] = useState({ x: 0, y: 0 });
   const [endCoords, setEndCoords] = useState({ x: 0, y: 0 });
-
   const [isDrawing, setIsDrawing] = useState({ active: false, type: 'draw' });
-
+  let zoomOffScale = { x: 0, y: 0, scale: 1 };
   //refs
+  const wrapperRef = useRef(null);
   const imageWrapperRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
-
-  //context data
 
   // document.addEventListener('keydown', event => {
   //   console.log(event.key);
   // });
-
+  //context data
   const {
     addNewSelection,
     setCurrentImageIndex,
@@ -92,25 +98,6 @@ function DashboardPage() {
     fullScreenWidth,
     setFullScreenWidth,
   } = useContext(Context) as ContextProps;
-
-  const onScroll = (e: React.WheelEvent) => {
-    const delta = e.deltaY * -0.01;
-    const newScale = pos.scale + delta;
-    const minScale = 1;
-    const maxScale = 4;
-    if (newScale >= minScale && newScale <= maxScale) {
-      if (newScale === 1) {
-        setPos({ scale: 1, x: 0, y: 0 });
-        return;
-      }
-      const ratio = 1 - newScale / pos.scale;
-      setPos({
-        scale: newScale,
-        x: pos.x + (e.clientX - pos.x) * ratio,
-        y: pos.y + (e.clientY - pos.y) * ratio,
-      });
-    }
-  };
 
   const toggleFullscreen = () => setIsFullscreen(prevVal => !prevVal);
 
@@ -140,26 +127,32 @@ function DashboardPage() {
   const handleMouseDown = (event: React.MouseEvent) => {
     event.preventDefault();
     if (imageRef.current) {
-      let x = event.clientX;
-      let y = event.clientY;
-      setStartCoords({ x, y });
+      let x = event.clientX / zoomOffScale.scale;
+      let y = event.clientY / zoomOffScale.scale;
+
+      setStartCoords({
+        x,
+        y,
+      });
       setEndCoords({ x, y });
       if (event.button === 0)
         setIsDrawing({ active: true, type: 'draw' }); // event 0 is left click
-      else setIsDrawing({ active: true, type: 'delete' });
+      else if (event.button === 2)
+        setIsDrawing({ active: true, type: 'delete' });
     }
   };
   const handleMouseMove = (event: React.MouseEvent) => {
-    if (isDrawing.active && imageRef.current)
+    if (isDrawing.active && imageRef.current) {
       setEndCoords({
-        x: event.clientX,
-        y: event.clientY,
+        x: event.clientX / zoomOffScale.scale,
+        y: event.clientY / zoomOffScale.scale,
       });
+    }
   };
 
   const handleMouseUp = (event: React.MouseEvent): void => {
     event.preventDefault();
-
+    console.log(startCoords, endCoords);
     addNewSelection(
       {
         imageId: currentImageIndex,
@@ -248,46 +241,99 @@ function DashboardPage() {
           </>
         )}
         {isFullscreen && (
-          <div className="container-fullscreen" onWheelCapture={onScroll}>
-            <img
-              ref={imageRef}
-              className="main-image-fullscreen"
-              src={imgUrls[currentImageIndex].img}
-              alt="select smoke"
-              style={{
-                transformOrigin: '0 0',
-                transform: ` translate(${pos.x}px, ${pos.y}px) scale(${pos.scale})`,
+          <div className="container-fullscreen">
+            <TransformWrapper
+              ref={wrapperRef}
+              onPanningStop={(ref, e: any) => {
+                //console.log(e.button);
+                console.log(ref.state);
               }}
-            ></img>
-            <div
-              className="selection-box"
-              style={{
-                top: currentImageRect.top,
-                left: currentImageRect.left,
-                width: `${currentImageRect.width}px`,
-                height: `${currentImageRect.height}px`,
+              panning={{ activationKeys: ['Alt'] }}
+              onZoomStop={(ref, e) => {
+                console.log(ref.state);
+                console.log(e);
+                //console.log(currentImageRect);
+                // setCurrentImageRect((prevRect: ImageRect) => {
+                //   return { top: 0, left: 0, width: 0, height: 0 };
+                // });
+                zoomOffScale = {
+                  x: ref.state.positionX,
+                  y: ref.state.positionY,
+                  scale: ref.state.scale,
+                };
               }}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              onMouseUp={handleMouseUp}
-            />
-            <Canvas
-              rect={currentImageRect}
-              scale={1}
-              index={currentImageIndex}
-              strokeWidth={2}
-            />
-            {isDrawing.active && (
-              <SelectBox
-                type={isDrawing.type}
-                startCoords={startCoords}
-                endCoords={endCoords}
-              />
-            )}
+              maxScale={2}
+              minScale={1}
+            >
+              <TransformComponent>
+                <img
+                  ref={imageRef}
+                  className="main-image-fullscreen"
+                  src={imgUrls[currentImageIndex].img}
+                  alt="select smoke"
+                ></img>
+
+                <Canvas
+                  rect={{
+                    top: 0,
+                    left: 0,
+                    width: currentImageRect.width,
+                    height: currentImageRect.height,
+                  }}
+                  scale={1}
+                  index={currentImageIndex}
+                  strokeWidth={2}
+                />
+
+                <div
+                  className="selection-box"
+                  style={{
+                    // top: currentImageRect.top,
+                    // left: currentImageRect.left,
+                    top: 0,
+                    left: 0,
+                    width: `${currentImageRect.width}px`,
+                    height: `${currentImageRect.height}px`,
+                  }}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseLeave={handleMouseLeave}
+                  onMouseUp={handleMouseUp}
+                />
+
+                {isDrawing.active && (
+                  <KeepScale>
+                    <SelectBox
+                      type={isDrawing.type}
+                      startCoords={startCoords}
+                      endCoords={endCoords}
+                      rect={{
+                        top: currentImageRect.top,
+                        left: currentImageRect.left,
+                        // top: 0,
+                        // left: 0,
+                      }}
+                    />
+                  </KeepScale>
+                )}
+                {isDrawing.active && (
+                  <SelectBox
+                    type={isDrawing.type}
+                    startCoords={startCoords}
+                    endCoords={endCoords}
+                    rect={{
+                      top: currentImageRect.top,
+                      left: currentImageRect.left,
+                      // top: 0,
+                      // left: 0,
+                    }}
+                  />
+                )}
+              </TransformComponent>
+            </TransformWrapper>
           </div>
         )}
-        <ControlPanel />
+        {!isFullscreen && <ControlPanel />}
       </ImageWrapper>
 
       {!isFullscreen && <Slider sliderInfo={imgUrls} />}
