@@ -9,6 +9,8 @@ from knox.views import LoginView as KnoxLoginView
 
 from .imageStuff import makeMask
 
+import paramiko
+
 
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
@@ -46,6 +48,21 @@ class Sequence(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, reqeust):
+        hostname = 
+        port = 22
+        username = 
+        password = 
+
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(hostname, port, username, password)
+        # _stdin, _stdout, _stderr = ssh.exec_command("ls")
+
+        _stdin, _stdout, _stderr = ssh.exec_command(
+            'find / -maxdepth 1 -type d -not -path "*/\.*" | shuf -n 1')
+        random_folder = _stdout.read().decode().strip()
+        print("Random folder", random_folder)
+        ssh.close()
         return Response({"success": True, "data": "sequence"})
 
     def post(self, request):
@@ -69,4 +86,4 @@ class Sequence(APIView):
             return Response({"succes": True, "message": "Sequence sent"})
         else:
             print(serializer.error_messages)
-            return Response({"fail": True, "message": "Sequence bad"})
+            return Response({"fail": True, "message": "Sequence not valid"})

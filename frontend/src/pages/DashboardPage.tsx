@@ -8,7 +8,11 @@ import Canvas from '../components/Canvas';
 import { ContextProps, ImageRect } from '../@interfaces/interfaces';
 import { Context } from '../context/context';
 import ControlPanel from '../components/ControlPanel';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import {
+  TransformWrapper,
+  TransformComponent,
+  KeepScale,
+} from 'react-zoom-pan-pinch';
 
 const Wrapper = styled.div`
   display: flex;
@@ -65,12 +69,16 @@ const ImageWrapper = styled.div`
 function DashboardPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [scale, setScale] = useState(0);
-  const [zoomScale, setZoomScale] = useState(1);
+  // const [zoomOffscale, setZoomOffscale] = useState({
+  //   x: 0,
+  //   y: 0,
+  //   scale: 1,
+  // });
   //for select box
   const [startCoords, setStartCoords] = useState({ x: 0, y: 0 });
   const [endCoords, setEndCoords] = useState({ x: 0, y: 0 });
   const [isDrawing, setIsDrawing] = useState({ active: false, type: 'draw' });
-
+  let zoomOffScale = { x: 0, y: 0, scale: 1 };
   //refs
   const wrapperRef = useRef(null);
   const imageWrapperRef = useRef<HTMLDivElement>(null);
@@ -119,8 +127,8 @@ function DashboardPage() {
   const handleMouseDown = (event: React.MouseEvent) => {
     event.preventDefault();
     if (imageRef.current) {
-      let x = event.clientX;
-      let y = event.clientY;
+      let x = event.clientX / zoomOffScale.scale;
+      let y = event.clientY / zoomOffScale.scale;
 
       setStartCoords({
         x,
@@ -136,15 +144,15 @@ function DashboardPage() {
   const handleMouseMove = (event: React.MouseEvent) => {
     if (isDrawing.active && imageRef.current) {
       setEndCoords({
-        x: event.clientX,
-        y: event.clientY,
+        x: event.clientX / zoomOffScale.scale,
+        y: event.clientY / zoomOffScale.scale,
       });
     }
   };
 
   const handleMouseUp = (event: React.MouseEvent): void => {
     event.preventDefault();
-
+    console.log(startCoords, endCoords);
     addNewSelection(
       {
         imageId: currentImageIndex,
@@ -236,19 +244,25 @@ function DashboardPage() {
           <div className="container-fullscreen">
             <TransformWrapper
               ref={wrapperRef}
-              onPanningStart={(ref, e: any) => {
+              onPanningStop={(ref, e: any) => {
                 //console.log(e.button);
+                console.log(ref.state);
               }}
               panning={{ activationKeys: ['Alt'] }}
               onZoomStop={(ref, e) => {
-                console.log(ref.state.scale);
-                console.log(currentImageRect);
+                console.log(ref.state);
+                console.log(e);
+                //console.log(currentImageRect);
                 // setCurrentImageRect((prevRect: ImageRect) => {
                 //   return { top: 0, left: 0, width: 0, height: 0 };
                 // });
-                setZoomScale(ref.state.scale);
+                zoomOffScale = {
+                  x: ref.state.positionX,
+                  y: ref.state.positionY,
+                  scale: ref.state.scale,
+                };
               }}
-              maxScale={2.5}
+              maxScale={2}
               minScale={1}
             >
               <TransformComponent>
@@ -258,6 +272,19 @@ function DashboardPage() {
                   src={imgUrls[currentImageIndex].img}
                   alt="select smoke"
                 ></img>
+
+                <Canvas
+                  rect={{
+                    top: 0,
+                    left: 0,
+                    width: currentImageRect.width,
+                    height: currentImageRect.height,
+                  }}
+                  scale={1}
+                  index={currentImageIndex}
+                  strokeWidth={2}
+                />
+
                 <div
                   className="selection-box"
                   style={{
@@ -273,18 +300,23 @@ function DashboardPage() {
                   onMouseLeave={handleMouseLeave}
                   onMouseUp={handleMouseUp}
                 />
-                <Canvas
-                  rect={{
-                    top: 0,
-                    left: 0,
-                    width: currentImageRect.width,
-                    height: currentImageRect.height,
-                  }}
-                  scale={1}
-                  index={currentImageIndex}
-                  strokeWidth={2}
-                />
-                {
+
+                {isDrawing.active && (
+                  <KeepScale>
+                    <SelectBox
+                      type={isDrawing.type}
+                      startCoords={startCoords}
+                      endCoords={endCoords}
+                      rect={{
+                        top: currentImageRect.top,
+                        left: currentImageRect.left,
+                        // top: 0,
+                        // left: 0,
+                      }}
+                    />
+                  </KeepScale>
+                )}
+                {isDrawing.active && (
                   <SelectBox
                     type={isDrawing.type}
                     startCoords={startCoords}
@@ -295,14 +327,13 @@ function DashboardPage() {
                       // top: 0,
                       // left: 0,
                     }}
-                    zoom={zoomScale}
                   />
-                }
+                )}
               </TransformComponent>
             </TransformWrapper>
           </div>
         )}
-        <ControlPanel />
+        {!isFullscreen && <ControlPanel />}
       </ImageWrapper>
 
       {!isFullscreen && <Slider sliderInfo={imgUrls} />}
