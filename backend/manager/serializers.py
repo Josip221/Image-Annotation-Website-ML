@@ -35,6 +35,7 @@ class ImageSelectionSerializer(serializers.Serializer):
 
 class DataSerializer(serializers.Serializer):
     selections = serializers.ListField(child=ImageSelectionSerializer())
+    sequence_name = serializers.CharField(max_length=100)
 
 
 class SequenceSerializer(serializers.ModelSerializer):

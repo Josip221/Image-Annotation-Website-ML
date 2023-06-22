@@ -132,8 +132,8 @@ export const adjustToScale = (selections: Selection[], scale: number) => {
   temp.forEach((selection: Selection) => {
     selection.selection.edges.forEach((edge: any) => {
       edge.forEach((number: [number, number]) => {
-        number[0] *= scale;
-        number[1] *= scale;
+        number[0] = Math.round(number[0] * scale);
+        number[1] = Math.round(number[1] * scale);
       });
     });
   });

@@ -8,7 +8,8 @@ export const fetchRandomSequence = () => {
 
 export const sendMarkedSequence = async (
   selections: Selection[],
-  token: string
+  token: string,
+  sequence_name: string
 ) => {
   try {
     const response = await fetch(`${url}sequence/`, {
@@ -17,7 +18,7 @@ export const sendMarkedSequence = async (
         'Content-Type': 'application/json',
         Authorization: `Token ${token}`,
       },
-      body: JSON.stringify({ selections }),
+      body: JSON.stringify({ selections, sequence_name }),
     });
     if (response.ok) {
       const data = await response.json();

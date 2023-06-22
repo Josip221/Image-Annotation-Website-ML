@@ -22,7 +22,11 @@ function ControlPanel() {
   const { token }: any = useAuth();
 
   const handleSubmit = () => {
-    sendMarkedSequence(adjustToScale(selections, fullImageRatioToOg), token);
+    sendMarkedSequence(
+      adjustToScale(selections, fullImageRatioToOg),
+      token,
+      'seq20221'
+    );
   };
   return (
     <Wrapper>
