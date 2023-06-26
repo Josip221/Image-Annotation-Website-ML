@@ -30,7 +30,7 @@ function LoginPage() {
   };
 
   const onSubmit = () => {
-    console.log(`Entered username: ${username}, password ${password}`);
+    //console.log(`Entered username: ${username}, password ${password}`);
     //empty inputs
     login(username, password);
   };

@@ -9,7 +9,6 @@ def makeEmptyMask():
     cv2.imwrite('example.png', image)
 
 
-# NEED TO ACCOUNT FOR ZOOM LEVEL
 def makeMask(selections, index):
     # maskfile = '%s/mask_%05d-frame-%02d.png' % ("dir", 11, 1)
 

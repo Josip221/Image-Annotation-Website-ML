@@ -42,13 +42,15 @@ const ContextProvider = ({ children }: any) => {
     if (intersection === 0) {
       setSelections((prevItems: Selection[]) => [...prevItems, newSelection]);
     } else {
-      setSelections((prevItems: Selection[]) => [...prevItems]);
+      setSelections((prevItems: Selection[]) => [
+        ...prevItems.filter(item => item.selection.edges.length > 0),
+      ]);
     }
   };
 
-  // const deleteSelectionForCurrentImage = () => {};
-
-  // const clearAll = () => {};
+  const clearAllSelections = () => {
+    setSelections([]);
+  };
   return (
     <Context.Provider
       value={{

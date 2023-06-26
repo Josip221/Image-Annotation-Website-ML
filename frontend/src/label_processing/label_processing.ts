@@ -1,3 +1,4 @@
+import { convertToObject } from 'typescript';
 import { ImageRect } from '../@interfaces/interfaces';
 import { Edge, Selection, Coord } from '../@interfaces/interfaces';
 import * as martinez from 'martinez-polygon-clipping';
@@ -5,40 +6,41 @@ const geometric = require('geometric');
 export const getAllCoordsOfRectangle = (
   startCoords: Coord,
   endCoords: Coord,
-  imageRect: ImageRect
+  imageRect: ImageRect,
+  zoomOffScale: { x: number; y: number; scale: number }
 ): Edge[] => {
   const x1: Coord = {
-    x: startCoords.x - imageRect.left,
-    y: startCoords.y - imageRect.top,
+    x: startCoords.x - imageRect.left - zoomOffScale.x,
+    y: startCoords.y - imageRect.top - zoomOffScale.y,
   };
   const x2: Coord = {
-    x: endCoords.x - imageRect.left,
-    y: startCoords.y - imageRect.top,
+    x: endCoords.x - imageRect.left - zoomOffScale.x,
+    y: startCoords.y - imageRect.top - zoomOffScale.y,
   };
   const x3: Coord = {
-    x: endCoords.x - imageRect.left,
-    y: endCoords.y - imageRect.top,
+    x: endCoords.x - imageRect.left - zoomOffScale.x,
+    y: endCoords.y - imageRect.top - zoomOffScale.y,
   };
   const x4: Coord = {
-    x: startCoords.x - imageRect.left,
-    y: endCoords.y - imageRect.top,
+    x: startCoords.x - imageRect.left - zoomOffScale.x,
+    y: endCoords.y - imageRect.top - zoomOffScale.y,
   };
   return [
     [
-      [x1.x, x1.y],
-      [x2.x, x2.y],
+      [x1.x / zoomOffScale.scale, x1.y / zoomOffScale.scale],
+      [x2.x / zoomOffScale.scale, x2.y / zoomOffScale.scale],
     ],
     [
-      [x2.x, x2.y],
-      [x3.x, x3.y],
+      [x2.x / zoomOffScale.scale, x2.y / zoomOffScale.scale],
+      [x3.x / zoomOffScale.scale, x3.y / zoomOffScale.scale],
     ],
     [
-      [x3.x, x3.y],
-      [x4.x, x4.y],
+      [x3.x / zoomOffScale.scale, x3.y / zoomOffScale.scale],
+      [x4.x / zoomOffScale.scale, x4.y / zoomOffScale.scale],
     ],
     [
-      [x4.x, x4.y],
-      [x1.x, x1.y],
+      [x4.x / zoomOffScale.scale, x4.y / zoomOffScale.scale],
+      [x1.x / zoomOffScale.scale, x1.y / zoomOffScale.scale],
     ],
   ];
 };
@@ -84,14 +86,12 @@ export const checkNewPolygon = (
       if (geometric.polygonInPolygon(polyB, polyA)) {
         intersection--;
       }
-
       //check if old inside new
       if (geometric.polygonInPolygon(polyA, polyB)) {
         if (action === 'draw') {
           polygon.selection.edges = newPolygon.selection.edges;
         } else if (action === 'delete') {
-          console.log('delete it');
-          //allPolygons.splice(allPolygons.indexOf(polygon), 1);
+          polygon.selection.edges = [];
         }
         intersection--;
       }

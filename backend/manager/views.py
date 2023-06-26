@@ -3,13 +3,13 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, DataSerializer
+from .serializers import UserSerializer, RegisterSerializer, DataSerializer, SequenceSerializer
 from django.contrib.auth import login
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.views import LoginView as KnoxLoginView
 
 from .imageStuff import makeMask
-from .models import ReviewedSequence
+
 import environ
 import json
 
@@ -108,6 +108,14 @@ class Sequence(APIView):
 
             # print("Sequence reviewed", serializer.validated_data)
             # save reviewed sequence and tag it
+            validated_data = {
+                'sequence_name': 'Example Sequence',
+                'review_amount': 5,
+                'images': 'example.jpg'
+            }
+            sez = SequenceSerializer(data=validated_data)
+            if sez.is_valid():
+                instance = sez.save()
 
             return Response({"succes": True, "message": "Sequence sent"})
         else:

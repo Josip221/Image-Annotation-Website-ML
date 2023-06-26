@@ -34,9 +34,9 @@ function RegisterPage() {
   };
 
   const onSubmit = () => {
-    console.log(
-      `Entered username: ${username}, password ${password}, email ${email}`
-    );
+    //  console.log(
+    //     `Entered username: ${username}, password ${password}, email ${email}`
+    //   );
     register(username, email, password);
   };
 

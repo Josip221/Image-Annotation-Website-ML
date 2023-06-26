@@ -24,6 +24,7 @@ export const sendMarkedSequence = async (
       const data = await response.json();
       console.log(data);
     } else {
+      console.log(selections, token, sequence_name);
       throw new Error('wrong format');
     }
   } catch (error: any) {

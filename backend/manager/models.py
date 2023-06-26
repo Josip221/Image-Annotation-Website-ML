@@ -16,7 +16,7 @@ class Sequence(models.Model):
     images = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.id
+        return self.sequence_name
 
 
 # store reviewed sequence, with its selections
@@ -26,7 +26,7 @@ class ReviewedSequence(models.Model):
     reviewed_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.id
+        return self.sequence_name
 
     class Meta:
         ordering = ["reviewed_at"]

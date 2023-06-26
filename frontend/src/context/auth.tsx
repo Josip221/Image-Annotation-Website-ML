@@ -7,7 +7,7 @@ export const Context = React.createContext<authContextProps | null>(null);
 const url = 'http://127.0.0.1:8000/api/';
 
 const AuthContextProvider = ({ children }: any) => {
-  const [token, setToken] = useLocalStorage('user', null);
+  const [token, setToken] = useLocalStorage('token', null);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -58,7 +58,7 @@ const AuthContextProvider = ({ children }: any) => {
       if (response.ok) {
         const data = await response.json();
         console.log(data);
-        setToken(username);
+        setToken(data.token);
         setTimeout(() => {
           navigate('/');
           setError('');
