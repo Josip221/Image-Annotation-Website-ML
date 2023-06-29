@@ -8,7 +8,8 @@ const url = 'http://127.0.0.1:8000/api/';
 
 const AuthContextProvider = ({ children }: any) => {
   const [token, setToken] = useLocalStorage('token', null);
-  const [error, setError] = useState('');
+  const [expiry, setExpiry] = useLocalStorage('expiry', null);
+  const [error, setError] = useState({ message: '' });
   const navigate = useNavigate();
 
   //login
@@ -25,9 +26,10 @@ const AuthContextProvider = ({ children }: any) => {
         const data = await response.json();
         console.log(data);
         setToken(data.token);
+        setExpiry(data.expiry);
         setTimeout(() => {
           navigate('/');
-          setError('');
+          setError({ message: '' });
         }, 200);
       } else {
         throw new Error('Incorrect credentials');
@@ -40,6 +42,7 @@ const AuthContextProvider = ({ children }: any) => {
 
   const logOut = async () => {
     setToken(null);
+    setExpiry(null);
   };
 
   const register = async (
@@ -59,9 +62,10 @@ const AuthContextProvider = ({ children }: any) => {
         const data = await response.json();
         console.log(data);
         setToken(data.token);
+        setExpiry(data.expiry);
         setTimeout(() => {
           navigate('/');
-          setError('');
+          setError({ message: '' });
         }, 200);
       } else {
         throw new Error('Incorrect credentials');
@@ -72,19 +76,10 @@ const AuthContextProvider = ({ children }: any) => {
     }
   };
 
-  //register
-
-  //logout
-  //   const value = useMemo(
-  //     () => ({
-  //       user,
-  //       login,
-  //     }),
-  //     [user, login]
-  //   );
-
   return (
-    <Context.Provider value={{ token, error, register, login, logOut }}>
+    <Context.Provider
+      value={{ token, error, expiry, register, login, logOut, setError }}
+    >
       {children}
     </Context.Provider>
   );

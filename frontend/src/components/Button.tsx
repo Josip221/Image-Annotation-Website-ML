@@ -4,11 +4,15 @@ import styled from 'styled-components';
 const Wrapper = styled.div`
   .button {
     all: unset;
+    font-weight: 400;
+    letter-spacing: 2px;
     cursor: pointer;
-    background-color: ${props => props.theme.colors.button};
-    padding: 0.2em;
+    margin: 0.5em;
+    border: 1px solid ${props => props.theme.colors.second};
+    padding: 0.2em 0.6em;
     &:hover {
       background-color: ${props => props.theme.colors.second};
+      transition: all 0.2s;
     }
   }
 `;

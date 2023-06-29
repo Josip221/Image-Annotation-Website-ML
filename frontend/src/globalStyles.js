@@ -4,7 +4,7 @@ export const theme = {
   colors: {
     first: '#white',
     second: '#cacaca',
-    third: 'rgb(202, 202, 202, 0.8)',
+    third: 'rgb(202, 202, 202)',
     button: '#b0b0b0',
     text: 'black',
   },
