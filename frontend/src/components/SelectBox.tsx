@@ -1,5 +1,3 @@
-import { read } from 'fs';
-import React from 'react';
 import styled from 'styled-components';
 interface Props {
   type: string;

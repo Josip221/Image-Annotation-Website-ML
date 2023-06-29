@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useContext,
+  useCallback,
+} from 'react';
 import styled from 'styled-components';
 import { imgUrls } from '../networking/mockupImgs';
 import { getAllCoordsOfRectangle } from '../label_processing/label_processing';
@@ -8,7 +14,11 @@ import Canvas from '../components/Canvas';
 import { ContextProps } from '../@interfaces/interfaces';
 import { Context } from '../context/context';
 import ControlPanel from '../components/ControlPanel';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import {
+  TransformWrapper,
+  TransformComponent,
+  ReactZoomPanPinchRef,
+} from 'react-zoom-pan-pinch';
 
 const Wrapper = styled.div`
   display: flex;
@@ -72,7 +82,7 @@ function DashboardPage() {
   const [zoomOffScale, setZoomOffScale] = useState({ x: 0, y: 0, scale: 1 });
 
   //refs
-  const wrapperRef = useRef(null);
+  const wrapperRef = useRef<ReactZoomPanPinchRef | null>(null);
   const imageWrapperRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -90,6 +100,7 @@ function DashboardPage() {
     setFullImageRatioToOg,
     fullScreenWidth,
     setFullScreenWidth,
+    copyPreviousToCurrent,
   } = useContext(Context) as ContextProps;
 
   const toggleFullscreen = () => setIsFullscreen(prevVal => !prevVal);
@@ -109,13 +120,18 @@ function DashboardPage() {
       toggleFullscreen();
     }
 
-    if (event.key === 'ArrowLeft') {
-      if (currentImageIndex === 0) setCurrentImageIndex(imgUrls.length - 1);
-      else setCurrentImageIndex(currentImageIndex - 1);
+    if (event.key === 'ArrowLeft' || event.key === 'a') {
+      if (currentImageIndex !== 0) setCurrentImageIndex(currentImageIndex - 1);
     }
-    if (event.key === 'ArrowRight') {
-      if (currentImageIndex === imgUrls.length - 1) setCurrentImageIndex(0);
-      else setCurrentImageIndex(currentImageIndex + 1);
+    if (event.key === 'ArrowRight' || event.key === 'd') {
+      if (currentImageIndex === imgUrls.length - 1) {
+        imageWrapperRef.current?.blur();
+        toggleFullscreen();
+      } else setCurrentImageIndex(currentImageIndex + 1);
+    }
+
+    if (event.key === 'ArrowUp' || event.key === 'w') {
+      copyPreviousToCurrent();
     }
   };
 
@@ -135,8 +151,7 @@ function DashboardPage() {
         y,
       });
       setEndCoords({ x, y });
-      if (event.button === 0)
-        setIsDrawing({ active: true, type: 'draw' }); // event 0 is left click
+      if (event.button === 0) setIsDrawing({ active: true, type: 'draw' });
       else if (event.button === 2)
         setIsDrawing({ active: true, type: 'delete' });
     }
@@ -152,7 +167,6 @@ function DashboardPage() {
 
   const handleMouseUp = (event: React.MouseEvent): void => {
     event.preventDefault();
-
     addNewSelection(
       {
         imageId: currentImageIndex,
@@ -176,19 +190,34 @@ function DashboardPage() {
       setIsDrawing(prev => ({ type: prev.type, active: false }));
   };
 
+  const setCurrentRect = useCallback(
+    (ref: React.RefObject<any>) => {
+      if (imageRef.current) {
+        const rect = imageRef.current.getBoundingClientRect();
+        setCurrentImageRect({
+          top: Math.round(rect.y),
+          left: Math.round(rect.x),
+          width: rect.width,
+          height: rect.height,
+        });
+      }
+    },
+    [setCurrentImageRect]
+  );
+
   useEffect(() => {
     //console.log('fetch image sequence here');
-  }, []);
+    if (wrapperRef.current) {
+      const { zoomOut } = wrapperRef.current;
+      zoomOut(1);
+      setZoomOffScale({ x: 0, y: 0, scale: 1 });
+      setCurrentRect(imageRef);
+    }
+  }, [currentImageIndex, setCurrentRect]);
 
   useEffect(() => {
     if (isFullscreen && imageRef.current) {
-      const rect = imageRef.current.getBoundingClientRect();
-      setCurrentImageRect({
-        top: Math.round(rect.y),
-        left: Math.round(rect.x),
-        width: rect.width,
-        height: rect.height,
-      });
+      setCurrentRect(imageRef);
       //ratio
       const nwidth = imageRef.current?.naturalWidth;
       const width = imageRef.current?.width;
@@ -196,13 +225,7 @@ function DashboardPage() {
       if (nwidth && width) setFullImageRatioToOg(+(nwidth / width).toFixed(2));
     }
     if (!isFullscreen && imageRef.current && fullScreenWidth !== 0) {
-      const rect = imageRef.current.getBoundingClientRect();
-      setCurrentImageRect({
-        top: Math.round(rect.y),
-        left: Math.round(rect.x),
-        width: rect.width,
-        height: rect.height,
-      });
+      setCurrentRect(imageRef);
       const width = imageRef.current?.width;
       if (width) setScale(+(fullScreenWidth / width).toFixed(2));
     }
@@ -214,6 +237,7 @@ function DashboardPage() {
     currentImageIndex,
     setFullImageRatioToOg,
     scale,
+    setCurrentRect,
   ]);
 
   return (
@@ -232,7 +256,7 @@ function DashboardPage() {
               ref={imageRef}
               className="main-image"
               src={imgUrls[currentImageIndex].img}
-              alt="select smoke"
+              alt="select"
             />
             <Canvas
               rect={currentImageRect}
@@ -261,12 +285,11 @@ function DashboardPage() {
                   }
                 }
 
-                console.log('THESE NUMBERS SMTH', values);
                 setZoomOffScale(prev => {
                   return { ...prev, x: values.x, y: values.y };
                 });
               }}
-              panning={{ activationKeys: ['Alt'] }}
+              //panning={{ activationKeys: ['Alt', 'Space'] }}
               onZoomStop={(ref, e) => {
                 let values = {
                   x: 0,
@@ -293,8 +316,8 @@ function DashboardPage() {
                   ref={imageRef}
                   className="main-image-fullscreen"
                   src={imgUrls[currentImageIndex].img}
-                  alt="select smoke"
-                ></img>
+                  alt="select"
+                />
 
                 <Canvas
                   rect={{
@@ -315,7 +338,7 @@ function DashboardPage() {
                   left: currentImageRect.left,
                   width: `${currentImageRect.width}px`,
                   height: `${currentImageRect.height}px`,
-                  zIndex: altPress ? -1 : 10,
+                  zIndex: altPress ? -1 : 1,
                 }}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}

@@ -1,4 +1,3 @@
-import { convertToObject } from 'typescript';
 import { ImageRect } from '../@interfaces/interfaces';
 import { Edge, Selection, Coord } from '../@interfaces/interfaces';
 import * as martinez from 'martinez-polygon-clipping';

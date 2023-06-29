@@ -9,6 +9,7 @@ export interface ContextProps {
   setFullImageRatioToOg: React.Dispatch<React.SetStateAction<number>>;
   fullScreenWidth: number;
   setFullScreenWidth: React.Dispatch<React.SetStateAction<number>>;
+  copyPreviousToCurrent: () => void;
 }
 
 export interface Selection {

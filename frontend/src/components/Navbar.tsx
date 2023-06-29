@@ -1,7 +1,6 @@
-import React from 'react';
 import styled from 'styled-components';
 import { Outlet, Link } from 'react-router-dom';
-import AuthContextProvider from '../context/auth';
+
 import { useAuth } from '../context/auth';
 
 const NavBar = styled.div`
@@ -25,14 +24,14 @@ const NavBar = styled.div`
   }
 `;
 
-const Footer = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 1em;
-  background-color: ${props => props.theme.colors.second};
-  gap: 1em;
-  margin-top: auto;
-`;
+// const Footer = styled.div`
+//   display: flex;
+//   align-items: center;
+//   padding: 1em;
+//   background-color: ${props => props.theme.colors.second};
+//   gap: 1em;
+//   margin-top: auto;
+// `;
 
 const Wrapper = styled.div`
   display: flex;

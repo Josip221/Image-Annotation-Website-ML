@@ -9,17 +9,15 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+from pathlib import Path
+import os
 import environ
 env = environ.Env()
 environ.Env.read_env()
-from pathlib import Path
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
 
 
 # Quick-start development settings - unsuitable for production
@@ -27,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
-#SECRET_KEY = 'django-insecure-nhxg)o6(2s337t#m=$ttt%!bs2-qyuu9ww16h-895!%7&3%%kg'
+# SECRET_KEY = 'django-insecure-nhxg)o6(2s337t#m=$ttt%!bs2-qyuu9ww16h-895!%7&3%%kg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,12 +36,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 
-
-
-
-
 INSTALLED_APPS = [
-   
+
     'rest_framework',
     'rest_framework.authtoken',
     'django.contrib.admin',
@@ -54,20 +48,19 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'manager',
     'knox',
-     'corsheaders',
-  
+    'corsheaders',
+
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
 ALLOWED_HOSTS = [
-    "127.0.0.1", 
+    "*",
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1", 
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://127.0.0.1",
+# ]
 CORS_ALLOW_CREDENTIALS = False
-
 
 
 MIDDLEWARE = [
@@ -106,13 +99,21 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': env("DB_NAME"),
+    #     'USER': env("DB_USER"),
+    #     'PASSWORD': env("DB_PASSWORD"),
+    #     'HOST': env("DB_HOST"),
+    #     'PORT': env("DB_PORT"),
+    # }
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env("DB_NAME"),
-        'USER': env("DB_USER"),
-        'PASSWORD': env("DB_PASSWORD"),
-        'HOST': env("DB_HOST"),
-        'PORT': env("DB_PORT"),
+        'NAME': "postgres",
+        'USER': "postgres",
+        'PASSWORD': "postgres",
+        'HOST': 'db',  # name of docker compose service
+        'PORT': 5432
     }
 }
 
@@ -168,6 +169,6 @@ REST_FRAMEWORK = {
     ]
 }
 
-ALLOWED_HOSTS=['*']
+ALLOWED_HOSTS = ['*']
 
 CORS_ORIGIN_ALLOW_ALL = True

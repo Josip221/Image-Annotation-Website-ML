@@ -11,7 +11,7 @@ from knox.views import LoginView as KnoxLoginView
 from .imageStuff import makeMask
 
 import environ
-import json
+
 
 env = environ.Env()
 environ.Env.read_env()

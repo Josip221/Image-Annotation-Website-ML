@@ -48,9 +48,27 @@ const ContextProvider = ({ children }: any) => {
     }
   };
 
-  const clearAllSelections = () => {
-    setSelections([]);
+  const copyPreviousToCurrent = () => {
+    const currentImageSelections = selections.filter(
+      (el: Selection) => el.imageId === currentImageIndex
+    );
+    if (currentImageIndex !== 0 && currentImageSelections.length === 0) {
+      const prevImageSelections = JSON.parse(JSON.stringify(selections));
+
+      prevImageSelections
+        .filter((el: Selection) => el.imageId === currentImageIndex - 1)
+        .forEach((item: Selection) => (item.imageId = currentImageIndex));
+
+      setSelections((prevItems: Selection[]) => [
+        ...prevItems,
+        ...prevImageSelections,
+      ]);
+    }
   };
+
+  // const clearAllSelections = () => {
+  //   setSelections([]);
+  // };
   return (
     <Context.Provider
       value={{
@@ -64,6 +82,7 @@ const ContextProvider = ({ children }: any) => {
         setFullImageRatioToOg,
         fullScreenWidth,
         setFullScreenWidth,
+        copyPreviousToCurrent,
       }}
     >
       {children}
