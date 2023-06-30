@@ -16,16 +16,19 @@ const Wrapper = styled.div`
 `;
 
 function Slider({ sliderInfo }: SliderProps) {
+  console.log('data', sliderInfo);
   const { currentImageIndex } = useContext(Context) as ContextProps;
   return (
     <Wrapper>
       {sliderInfo.map((item, index) => {
+        console.log(item);
         return (
           <SliderItem
             active={currentImageIndex === index ? true : false}
             key={index}
             index={index}
-            img={item.img}
+            img={item.image}
+            name={item.imageName}
           />
         );
       })}

@@ -6,7 +6,6 @@ import React, {
   useCallback,
 } from 'react';
 import styled from 'styled-components';
-import { imgUrls } from '../networking/mockupImgs';
 import { getAllCoordsOfRectangle } from '../label_processing/label_processing';
 import Slider from '../components/Slider';
 import SelectBox from '../components/SelectBox';
@@ -19,6 +18,8 @@ import {
   TransformComponent,
   ReactZoomPanPinchRef,
 } from 'react-zoom-pan-pinch';
+import { useAuth } from '../context/auth';
+import { authContextProps } from '../@interfaces/authContext';
 
 const Wrapper = styled.div`
   display: flex;
@@ -86,11 +87,6 @@ function DashboardPage() {
   const imageWrapperRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
-  // document.addEventListener('keydown', event => {
-  //   console.log(event.key);
-  // });
-
-  //context data
   const {
     addNewSelection,
     setCurrentImageIndex,
@@ -101,7 +97,11 @@ function DashboardPage() {
     fullScreenWidth,
     setFullScreenWidth,
     copyPreviousToCurrent,
+    setImages,
+    sequenceData,
   } = useContext(Context) as ContextProps;
+
+  const { token } = useAuth() as authContextProps;
 
   const toggleFullscreen = () => setIsFullscreen(prevVal => !prevVal);
 
@@ -124,7 +124,7 @@ function DashboardPage() {
       if (currentImageIndex !== 0) setCurrentImageIndex(currentImageIndex - 1);
     }
     if (event.key === 'ArrowRight' || event.key === 'd') {
-      if (currentImageIndex === imgUrls.length - 1) {
+      if (currentImageIndex === sequenceData.images.length - 1) {
         imageWrapperRef.current?.blur();
         toggleFullscreen();
       } else setCurrentImageIndex(currentImageIndex + 1);
@@ -206,6 +206,11 @@ function DashboardPage() {
   );
 
   useEffect(() => {
+    console.log('fetching');
+    setImages(token);
+  }, []);
+
+  useEffect(() => {
     //console.log('fetch image sequence here');
     if (wrapperRef.current) {
       const { zoomOut } = wrapperRef.current;
@@ -242,127 +247,131 @@ function DashboardPage() {
 
   return (
     <Wrapper>
-      <ImageWrapper
-        ref={imageWrapperRef}
-        tabIndex={0}
-        onContextMenu={event => event.preventDefault()} //disable menu on right click
-        onClick={handleMainImageClick}
-        onKeyDown={handleKeyClick}
-        onKeyUp={handleKeyUp}
-      >
-        {!isFullscreen && (
-          <>
-            <img
-              ref={imageRef}
-              className="main-image"
-              src={imgUrls[currentImageIndex].img}
-              alt="select"
-            />
-            <Canvas
-              rect={currentImageRect}
-              scale={1 / scale}
-              index={currentImageIndex}
-              strokeWidth={2}
-            />
-          </>
-        )}
-        {isFullscreen && (
-          <div className="container-fullscreen">
-            <TransformWrapper
-              ref={wrapperRef}
-              onPanningStop={(ref, e: any) => {
-                let values = {
-                  x: 0,
-                  y: 0,
-                };
-
-                if (ref.state.scale !== 1) {
-                  if (ref.state.positionX <= 0) {
-                    values.x = ref.state.positionX;
-                  }
-                  if (ref.state.positionY <= 0) {
-                    values.y = ref.state.positionY;
-                  }
-                }
-
-                setZoomOffScale(prev => {
-                  return { ...prev, x: values.x, y: values.y };
-                });
-              }}
-              //panning={{ activationKeys: ['Alt', 'Space'] }}
-              onZoomStop={(ref, e) => {
-                let values = {
-                  x: 0,
-                  y: 0,
-                  scale: 1,
-                };
-                if (ref.state.scale !== 1) {
-                  values.scale = ref.state.scale;
-                  if (ref.state.positionX <= 0) {
-                    values.x = ref.state.positionX;
-                  }
-                  if (ref.state.positionY <= 0) {
-                    values.y = ref.state.positionY;
-                  }
-                }
-                console.log('values before save', values);
-                setZoomOffScale(values);
-              }}
-              maxScale={2}
-              minScale={1}
-            >
-              <TransformComponent>
+      {sequenceData.images.length > 0 && (
+        <>
+          <ImageWrapper
+            ref={imageWrapperRef}
+            tabIndex={0}
+            onContextMenu={event => event.preventDefault()}
+            onClick={handleMainImageClick}
+            onKeyDown={handleKeyClick}
+            onKeyUp={handleKeyUp}
+          >
+            {!isFullscreen && (
+              <>
                 <img
                   ref={imageRef}
-                  className="main-image-fullscreen"
-                  src={imgUrls[currentImageIndex].img}
+                  className="main-image"
+                  src={sequenceData.images[currentImageIndex].image}
                   alt="select"
                 />
-
                 <Canvas
-                  rect={{
-                    top: 0,
-                    left: 0,
-                    width: currentImageRect.width,
-                    height: currentImageRect.height,
-                  }}
-                  scale={1}
+                  rect={currentImageRect}
+                  scale={1 / scale}
                   index={currentImageIndex}
                   strokeWidth={2}
                 />
-              </TransformComponent>
-              <div
-                className="selection-box"
-                style={{
-                  top: currentImageRect.top,
-                  left: currentImageRect.left,
-                  width: `${currentImageRect.width}px`,
-                  height: `${currentImageRect.height}px`,
-                  zIndex: altPress ? -1 : 1,
-                }}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-                onMouseUp={handleMouseUp}
-              />
-              {isDrawing.active && (
-                <SelectBox
-                  type={isDrawing.type}
-                  startCoords={startCoords}
-                  endCoords={endCoords}
-                  rect={{
-                    top: 0,
-                    left: 0,
-                  }}
-                />
-              )}
-            </TransformWrapper>
-          </div>
-        )}
-        {!isFullscreen && <ControlPanel />}
-      </ImageWrapper>
+              </>
+            )}
+            {isFullscreen && (
+              <div className="container-fullscreen">
+                <TransformWrapper
+                  ref={wrapperRef}
+                  onPanningStop={(ref, e: any) => {
+                    let values = {
+                      x: 0,
+                      y: 0,
+                    };
 
-      {!isFullscreen && <Slider sliderInfo={imgUrls} />}
+                    if (ref.state.scale !== 1) {
+                      if (ref.state.positionX <= 0) {
+                        values.x = ref.state.positionX;
+                      }
+                      if (ref.state.positionY <= 0) {
+                        values.y = ref.state.positionY;
+                      }
+                    }
+                    setZoomOffScale(prev => {
+                      return { ...prev, x: values.x, y: values.y };
+                    });
+                  }}
+                  //panning={{ activationKeys: ['Alt', 'Space'] }}
+                  onZoomStop={(ref, e) => {
+                    let values = {
+                      x: 0,
+                      y: 0,
+                      scale: 1,
+                    };
+                    if (ref.state.scale !== 1) {
+                      values.scale = ref.state.scale;
+                      if (ref.state.positionX <= 0) {
+                        values.x = ref.state.positionX;
+                      }
+                      if (ref.state.positionY <= 0) {
+                        values.y = ref.state.positionY;
+                      }
+                    }
+                    console.log('values before save', values);
+                    setZoomOffScale(values);
+                  }}
+                  maxScale={2}
+                  minScale={1}
+                >
+                  <TransformComponent>
+                    <img
+                      ref={imageRef}
+                      className="main-image-fullscreen"
+                      src={sequenceData.images[currentImageIndex].image}
+                      alt="select"
+                    />
+
+                    <Canvas
+                      rect={{
+                        top: 0,
+                        left: 0,
+                        width: currentImageRect.width,
+                        height: currentImageRect.height,
+                      }}
+                      scale={1}
+                      index={currentImageIndex}
+                      strokeWidth={2}
+                    />
+                  </TransformComponent>
+                  <div
+                    className="selection-box"
+                    style={{
+                      top: currentImageRect.top,
+                      left: currentImageRect.left,
+                      width: `${currentImageRect.width}px`,
+                      height: `${currentImageRect.height}px`,
+                      zIndex: altPress ? -1 : 1,
+                    }}
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={handleMouseLeave}
+                    onMouseUp={handleMouseUp}
+                  />
+                  {isDrawing.active && (
+                    <SelectBox
+                      type={isDrawing.type}
+                      startCoords={startCoords}
+                      endCoords={endCoords}
+                      rect={{
+                        top: 0,
+                        left: 0,
+                      }}
+                    />
+                  )}
+                </TransformWrapper>
+              </div>
+            )}
+            {!isFullscreen && <ControlPanel />}
+          </ImageWrapper>
+
+          {!isFullscreen && <Slider sliderInfo={sequenceData.images} />}
+        </>
+      )}
+      {!sequenceData.images.length && <h1>Fetching images...</h1>}
     </Wrapper>
   );
 }

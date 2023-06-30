@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
 import { checkNewPolygon } from '../label_processing/label_processing';
-
+import { fetchRandomSequence } from '../networking/sequenceControllerNetwork';
 import { Selection, ContextProps } from '../@interfaces/interfaces';
 
 export const Context = React.createContext<ContextProps | null>(null);
 
 const ContextProvider = ({ children }: any) => {
+  const [sequenceData, setSequenceData] = useState<{
+    sequenceName: string;
+
+    images: { imageName: string; image: string }[];
+  }>({
+    sequenceName: 'loading',
+    images: [],
+  });
   const [fullImageRatioToOg, setFullImageRatioToOg] = useState<number>(1);
   const [fullScreenWidth, setFullScreenWidth] = useState<number>(1);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
@@ -19,7 +27,6 @@ const ContextProvider = ({ children }: any) => {
   const [selections, setSelections] = useState<Selection[]>([]);
 
   const addNewSelection = (newSelection: Selection, action: string) => {
-    //newSelection width cant be 1x1
     if (
       JSON.stringify(newSelection.selection.edges[0]) ===
       JSON.stringify(newSelection.selection.edges[2])
@@ -66,6 +73,24 @@ const ContextProvider = ({ children }: any) => {
     }
   };
 
+  const setImages = async (token: string) => {
+    const response = await fetchRandomSequence(token);
+    if (sequenceData.images.length < 1) {
+      const base64Mod = response.data.images.map(
+        (item: { imageName: string; image: string }) => {
+          return {
+            imageName: item.imageName,
+            image: 'data:image/jpeg;base64,' + item.image,
+          };
+        }
+      );
+      setSequenceData({
+        sequenceName: response.data.name,
+        images: base64Mod,
+      });
+    }
+  };
+
   // const clearAllSelections = () => {
   //   setSelections([]);
   // };
@@ -83,6 +108,8 @@ const ContextProvider = ({ children }: any) => {
         fullScreenWidth,
         setFullScreenWidth,
         copyPreviousToCurrent,
+        setImages,
+        sequenceData,
       }}
     >
       {children}

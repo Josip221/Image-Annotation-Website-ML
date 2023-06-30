@@ -1,9 +1,10 @@
 export interface SliderProps {
-  sliderInfo: { img: string }[];
+  sliderInfo: { imageName: string; image: string }[];
 }
 
 export interface SliderItemProps {
   active: boolean;
   img: string;
   index: number;
+  name: string;
 }

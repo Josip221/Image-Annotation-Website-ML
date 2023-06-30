@@ -2,8 +2,21 @@ import { Selection } from '../@interfaces/interfaces';
 
 const url = 'http://127.0.0.1:8000/api/';
 
-export const fetchRandomSequence = () => {
-  //get random sequence, return it
+export const fetchRandomSequence = async (token: string) => {
+  try {
+    const response = await fetch(`${url}sequence/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Token ${token}`,
+      },
+    });
+    const data = await response.json();
+    console.log(data);
+    return data;
+  } catch (error: any) {
+    console.log('error occured: ', error);
+  }
 };
 
 export const sendMarkedSequence = async (

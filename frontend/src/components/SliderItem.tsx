@@ -34,7 +34,7 @@ const Wrapper = styled.div`
   }
 `;
 
-function SliderItem({ active = false, img, index }: SliderItemProps) {
+function SliderItem({ active = false, img, name, index }: SliderItemProps) {
   const imageRef = useRef<HTMLImageElement>(null);
   const { setCurrentImageIndex, fullScreenWidth } = useContext(
     Context
@@ -62,7 +62,7 @@ function SliderItem({ active = false, img, index }: SliderItemProps) {
       });
       setScale(1 / +(fullScreenWidth / imageRef.current.width).toFixed(1));
     }
-  }, [fullScreenWidth]);
+  }, [fullScreenWidth, img]);
 
   return (
     <Wrapper onClick={handleClick}>
@@ -79,7 +79,7 @@ function SliderItem({ active = false, img, index }: SliderItemProps) {
           index={index}
           strokeWidth={1}
         />
-        <div>img_0000.jpg</div>
+        <div>{name}</div>
       </div>
     </Wrapper>
   );

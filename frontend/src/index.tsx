@@ -50,12 +50,10 @@ const root = ReactDOM.createRoot(
 );
 
 root.render(
-  <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <ContextProvider>
-        <GlobalStyle />
-        <RouterProvider router={router} />
-      </ContextProvider>
-    </ThemeProvider>
-  </React.StrictMode>
+  <ThemeProvider theme={theme}>
+    <ContextProvider>
+      <GlobalStyle />
+      <RouterProvider router={router} />
+    </ContextProvider>
+  </ThemeProvider>
 );

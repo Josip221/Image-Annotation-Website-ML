@@ -12,7 +12,6 @@ const AuthContextProvider = ({ children }: any) => {
   const [error, setError] = useState({ message: '' });
   const navigate = useNavigate();
 
-  //login
   const login = async (username: string, password: string) => {
     try {
       const response = await fetch(`${url}login/`, {
@@ -78,7 +77,15 @@ const AuthContextProvider = ({ children }: any) => {
 
   return (
     <Context.Provider
-      value={{ token, error, expiry, register, login, logOut, setError }}
+      value={{
+        token,
+        error,
+        expiry,
+        register,
+        login,
+        logOut,
+        setError,
+      }}
     >
       {children}
     </Context.Provider>

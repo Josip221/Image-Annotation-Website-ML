@@ -7,9 +7,11 @@ from .serializers import UserSerializer, RegisterSerializer, DataSerializer, Seq
 from django.contrib.auth import login
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.views import LoginView as KnoxLoginView
-
+from django.http import FileResponse
 from .imageStuff import makeMask
-
+import io
+import base64
+from PIL import Image
 import environ
 
 
@@ -62,30 +64,49 @@ class Sequence(APIView):
 
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname, port, username, password)
-        # _stdin, _stdout, _stderr = ssh.exec_command("ls")
 
-        # fetch a previously tagged sequence
+        try:
+            ssh.connect(hostname, port, username, password)
 
+            # _stdin, _stdout, _stderr = ssh.exec_command(
+            # 'ls /home/jmaretic/UPLOAD-SEKVENCE/NEOZNACENE/Srima_001-1920x1080-v5p2')
+            _stdin, _stdout, _stderr = ssh.exec_command(
+            'pwd')
+            random_folder = _stdout.read().decode().strip()
+            #print("Random folder \n", random_folder)
+
+            
+
+            sftp = ssh.open_sftp()
+            seqName = sftp.listdir("./UPLOAD-SEKVENCE/NEOZNACENE")[2]
+            #sftp.get( "/home/jmaretic/UPLOAD-SEKVENCE/NEOZNACENE/Srima_001-1920x1080-v5p2/image_09703-frame-11.jpg", pathToLocal)
+            file_obj = sftp.open("/home/jmaretic/UPLOAD-SEKVENCE/NEOZNACENE/Srima_001-1920x1080-v5p2/image_09703-frame-11.jpg", 'rb')
+            image_data = file_obj.read()
+            file_obj.close()
+            sftp.close()
+
+            image = Image.open(io.BytesIO(image_data))
+           
+
+            image_buffer = io.BytesIO()
+            image.save(image_buffer, format='JPEG')
+            image_buffer.seek(0)
+            encoded_image = base64.b64encode(image_buffer.getvalue()).decode('utf-8')
+
+
+            
+           
+        except paramiko.AuthenticationException:
+            print("Authentication failed. Please check your credentials.")
+        except paramiko.SSHException as e:
+            print("Unable to establish SSH connection:", str(e))
+        finally:
+             ssh.close()
         # if no tagged sequences, fetch random sequence
-        _stdin, _stdout, _stderr = ssh.exec_command(
-            'ls /home/jmaretic')
-        random_folder = _stdout.read().decode().strip()
-        print("Random folder", random_folder)
-
-        # sftp = ssh.open_sftp()
-
-        # try:
-        #     sftp.chdir("testingFolder1")
-        #     sftp.get("image_02621-frame-01.jpg", pathToLocal)
-        #     print("image found")
-        # except FileNotFoundError:
-        #     print("not found")
-        # finally:
-        #     sftp.close()
-        #     ssh.close()
-        # return the sequence
-        return Response({"success": True, "data": "sequence"})
+        
+        #response = FileResponse(image_buffer, content_type='image/jpeg')
+        #return response
+        return Response({"success": True, "data": {"sequenceName": seqName, "images": [{"imageName": "test", "image": encoded_image}, {"imageName": "test", "image": encoded_image}, {"imageName": "test", "image": encoded_image}, {"imageName": "test", "image": encoded_image}]}})
 
     def post(self, request):
 
