@@ -8,6 +8,8 @@ import Canvas from './Canvas';
 const Wrapper = styled.div`
   position: relative;
   .slider-item {
+    display: flex;
+    align-items: center;
     &:hover {
       cursor: pointer;
     }
@@ -16,7 +18,7 @@ const Wrapper = styled.div`
     width: 100%;
     border-radius: 10px;
     background-color: whitesmoke;
-    box-shadow: inset 0 -3em 3em rgba(0, 0, 0, 0.1),
+    box-shadow: inset 0 -1em 1em rgba(0, 0, 0, 0.1),
       0 0 0 2px rgb(255, 255, 255), 0.3em 0.3em 1em rgba(0, 0, 0, 0.3);
   }
   .slider-item_active {

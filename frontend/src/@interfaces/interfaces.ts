@@ -15,6 +15,7 @@ export interface ContextProps {
     sequenceName: string;
     images: { imageName: string; image: string }[];
   };
+  clearAll: () => void;
 }
 
 export interface Selection {

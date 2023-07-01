@@ -14,6 +14,12 @@ const Wrapper = styled.div`
       background-color: ${props => props.theme.colors.second};
       transition: all 0.2s;
     }
+    &:focus-visible {
+      outline: none;
+
+      box-shadow: 0 0 2px 2px ${props => props.theme.colors.second};
+      border: 2px solid black;
+    }
   }
 `;
 

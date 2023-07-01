@@ -1,4 +1,4 @@
-import paramiko
+
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -7,12 +7,13 @@ from .serializers import UserSerializer, RegisterSerializer, DataSerializer, Seq
 from django.contrib.auth import login
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.views import LoginView as KnoxLoginView
-from django.http import FileResponse
 from .imageStuff import makeMask
 import io
 import base64
 from PIL import Image
 import environ
+import os
+import random
 
 
 env = environ.Env()
@@ -55,58 +56,39 @@ class Sequence(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, reqeust):
-        hostname = env("HOSTNAME")
-        port = env("PORT")
-        username = env("USER")
-        password = env("PASSWORD")
+        
+        seqName = random.choice(os.listdir("../UPLOAD-SEKVENCE/NEOZNACENE"))
+        file_list = os.listdir(f"../UPLOAD-SEKVENCE/NEOZNACENE/{seqName}")
+        jpeg_files_with_frame00 = [file for file in file_list if file.startswith("image_") and "frame-00" in file]
 
-        pathToLocal = "images/imageFetched.png"
+        if not jpeg_files_with_frame00:
+            print("No images with frame-00 found.")
+        else:
+            random_image_with_frame00 = random.choice(jpeg_files_with_frame00)
+            base_filename = random_image_with_frame00.replace("frame-00.jpg", "")
+            selected_files = [
+                file for file in file_list if file.startswith(base_filename)
+            ]
 
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        try:
-            ssh.connect(hostname, port, username, password)
+        images = []
+        
+        for file in selected_files:
+            imageName = file.split(".")[0]
 
-            # _stdin, _stdout, _stderr = ssh.exec_command(
-            # 'ls /home/jmaretic/UPLOAD-SEKVENCE/NEOZNACENE/Srima_001-1920x1080-v5p2')
-            _stdin, _stdout, _stderr = ssh.exec_command(
-            'pwd')
-            random_folder = _stdout.read().decode().strip()
-            #print("Random folder \n", random_folder)
-
-            
-
-            sftp = ssh.open_sftp()
-            seqName = sftp.listdir("./UPLOAD-SEKVENCE/NEOZNACENE")[2]
-            #sftp.get( "/home/jmaretic/UPLOAD-SEKVENCE/NEOZNACENE/Srima_001-1920x1080-v5p2/image_09703-frame-11.jpg", pathToLocal)
-            file_obj = sftp.open("/home/jmaretic/UPLOAD-SEKVENCE/NEOZNACENE/Srima_001-1920x1080-v5p2/image_09703-frame-11.jpg", 'rb')
-            image_data = file_obj.read()
-            file_obj.close()
-            sftp.close()
-
+            file_path=f"../UPLOAD-SEKVENCE/NEOZNACENE/{seqName}/{file}"
+            if os.path.isfile(file_path):
+                with open(file_path, 'rb') as file:
+                    image_data = file.read()
+                
             image = Image.open(io.BytesIO(image_data))
-           
-
             image_buffer = io.BytesIO()
             image.save(image_buffer, format='JPEG')
             image_buffer.seek(0)
             encoded_image = base64.b64encode(image_buffer.getvalue()).decode('utf-8')
+            images.append({"imageName": imageName, "image": encoded_image})
 
-
-            
-           
-        except paramiko.AuthenticationException:
-            print("Authentication failed. Please check your credentials.")
-        except paramiko.SSHException as e:
-            print("Unable to establish SSH connection:", str(e))
-        finally:
-             ssh.close()
-        # if no tagged sequences, fetch random sequence
-        
-        #response = FileResponse(image_buffer, content_type='image/jpeg')
-        #return response
-        return Response({"success": True, "data": {"sequenceName": seqName, "images": [{"imageName": "test", "image": encoded_image}, {"imageName": "test", "image": encoded_image}, {"imageName": "test", "image": encoded_image}, {"imageName": "test", "image": encoded_image}]}})
+        return Response({"success": True, "data": {"sequenceName": seqName, "images": images}})
 
     def post(self, request):
 

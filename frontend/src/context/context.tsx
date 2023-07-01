@@ -75,25 +75,28 @@ const ContextProvider = ({ children }: any) => {
 
   const setImages = async (token: string) => {
     const response = await fetchRandomSequence(token);
-    if (sequenceData.images.length < 1) {
-      const base64Mod = response.data.images.map(
-        (item: { imageName: string; image: string }) => {
-          return {
-            imageName: item.imageName,
-            image: 'data:image/jpeg;base64,' + item.image,
-          };
-        }
-      );
-      setSequenceData({
-        sequenceName: response.data.name,
-        images: base64Mod,
-      });
-    }
+
+    const base64Mod = response.data.images.map(
+      (item: { imageName: string; image: string }) => {
+        return {
+          imageName: item.imageName,
+          image: 'data:image/jpeg;base64,' + item.image,
+        };
+      }
+    );
+    setSequenceData({
+      sequenceName: response.data.sequenceName,
+      images: base64Mod,
+    });
   };
 
-  // const clearAllSelections = () => {
-  //   setSelections([]);
-  // };
+  const clearAll = () => {
+    setSelections([]);
+    setSequenceData({
+      sequenceName: 'loading',
+      images: [],
+    });
+  };
   return (
     <Context.Provider
       value={{
@@ -110,6 +113,7 @@ const ContextProvider = ({ children }: any) => {
         copyPreviousToCurrent,
         setImages,
         sequenceData,
+        clearAll,
       }}
     >
       {children}

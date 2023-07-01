@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 from pathlib import Path
-import os
+
 import environ
 env = environ.Env()
 environ.Env.read_env()
@@ -101,18 +101,18 @@ WSGI_APPLICATION = 'app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env("DB_NAME"),
-        'USER': env("DB_USER"),
-        'PASSWORD': env("DB_PASSWORD"),
-        'HOST': env("DB_HOST"),
-        'PORT': env("DB_PORT"),
+        'NAME': env("POSTGRES_DB"),
+        'USER': env("POSTGRES_USER"),
+        'PASSWORD': env("POSTGRES_PASSWORD"),
+        'HOST': env("POSTGRES_HOST"),
+        'PORT': env("POSTGRES_PORT"),
     }
     # 'default': {
     #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #     'NAME': "postgres",
+    #     'NAME': "stribor",
     #     'USER': "postgres",
     #     'PASSWORD': "postgres",
-    #     'HOST': 'db',  # name of docker compose service
+    #     'HOST': 'localhost',  # name of docker compose service
     #     'PORT': 5432
     # }
 }

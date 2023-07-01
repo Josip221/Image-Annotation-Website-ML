@@ -11,16 +11,18 @@ function ProtectedRoute({ children }: any) {
   const tokenCheck = useCallback(
     (expiry: string) => {
       const currentDateTime = new Date().toISOString();
-      const tokenExpiryDateTime = new Date(expiry).toISOString();
+      if (expiry != null) {
+        const tokenExpiryDateTime = new Date(expiry).toISOString();
 
-      if (currentDateTime > tokenExpiryDateTime) {
-        console.log('token expired');
-        setError({ message: 'Token expired. Login again' });
-        logOut();
-        navigate('/login');
+        if (currentDateTime > tokenExpiryDateTime && token) {
+          console.log('token expired');
+          setError({ message: 'Token expired. Login again' });
+          logOut();
+          navigate('/login');
+        }
       }
     },
-    [logOut, navigate, setError]
+    [logOut, navigate, setError, token]
   );
 
   const handleVisibilityChange = useCallback(() => {

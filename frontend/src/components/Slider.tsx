@@ -9,7 +9,7 @@ const Wrapper = styled.div`
   display: grid;
   width: 70%;
   grid-template-columns: repeat(auto-fill, minmax(800px, 1fr));
-  gap: 0.5em;
+  gap: 1em;
   margin: 1em;
   max-height: 100%;
   overflow: auto;

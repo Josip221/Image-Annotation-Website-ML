@@ -4,9 +4,12 @@ services:
   db:
     image: postgres
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
   django:
     build:
       context: ./backend
@@ -15,11 +18,13 @@ services:
     ports:
       - '8000:8000'
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     depends_on:
       - db
+    volumes:
+      - ./UPLOAD-SEKVENCE:/UPLOAD-SEKVENCE
   react:
     build:
       context: ./frontend
@@ -37,3 +42,6 @@ services:
       - django
       - react
       - db
+
+volumes:
+  db_data:

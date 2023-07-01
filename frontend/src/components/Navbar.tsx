@@ -1,7 +1,9 @@
 import styled from 'styled-components';
 import { Outlet, Link } from 'react-router-dom';
-
+import { useContext } from 'react';
 import { useAuth } from '../context/auth';
+import { Context } from '../context/context';
+import { ContextProps } from '../@interfaces/interfaces';
 
 const NavBar = styled.div`
   display: flex;
@@ -24,15 +26,6 @@ const NavBar = styled.div`
   }
 `;
 
-// const Footer = styled.div`
-//   display: flex;
-//   align-items: center;
-//   padding: 1em;
-//   background-color: ${props => props.theme.colors.second};
-//   gap: 1em;
-//   margin-top: auto;
-// `;
-
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -41,6 +34,7 @@ const Wrapper = styled.div`
 
 function Navbar() {
   const { token, logOut }: any = useAuth();
+  const { sequenceData } = useContext(Context) as ContextProps;
   //console.log(token);
   return (
     <Wrapper>
@@ -61,7 +55,7 @@ function Navbar() {
         {token && (
           <>
             <Link className="link push-right" to={'/home'}>
-              Sequence_1234
+              {sequenceData.sequenceName}
             </Link>
             <Link onClick={() => logOut()} className="link" to="/login">
               Log out

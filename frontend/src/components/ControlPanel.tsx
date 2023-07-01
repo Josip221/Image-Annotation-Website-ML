@@ -6,7 +6,7 @@ import { ContextProps } from '../@interfaces/interfaces';
 import { sendMarkedSequence } from '../networking/sequenceControllerNetwork';
 import { useAuth } from '../context/auth';
 import { adjustToScale } from '../label_processing/label_processing';
-
+import { authContextProps } from '../@interfaces/authContext';
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -33,11 +33,11 @@ const Wrapper = styled.div`
 `;
 
 function ControlPanel() {
-  const { selections, fullImageRatioToOg } = useContext(
+  const { selections, fullImageRatioToOg, setImages, clearAll } = useContext(
     Context
   ) as ContextProps;
 
-  const { token }: any = useAuth();
+  const { token } = useAuth() as authContextProps;
 
   const handleSubmit = () => {
     sendMarkedSequence(
@@ -46,11 +46,15 @@ function ControlPanel() {
       'seq20221' //name of seqeunce folder, will fix
     );
   };
+
+  const handleNext = () => {
+    clearAll();
+    setImages(token);
+  };
   return (
     <Wrapper>
       <Button parentFunction={handleSubmit}>Submit</Button>
-      <Button>Submit & Get Next sequence</Button>
-      <Button>Next Sequence</Button>
+      <Button parentFunction={handleNext}>Next Sequence</Button>
       <div className="controls--box">
         <h1>Controls:</h1>
         <div className="controls">
