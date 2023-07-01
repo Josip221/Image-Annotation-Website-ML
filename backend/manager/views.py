@@ -56,7 +56,8 @@ class Sequence(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, reqeust):
-        
+        print("test")
+        print(os.getcwd())
         seqName = random.choice(os.listdir("../UPLOAD-SEKVENCE/NEOZNACENE"))
         file_list = os.listdir(f"../UPLOAD-SEKVENCE/NEOZNACENE/{seqName}")
         jpeg_files_with_frame00 = [file for file in file_list if file.startswith("image_") and "frame-00" in file]

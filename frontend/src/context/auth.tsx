@@ -1,23 +1,23 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { authContextProps } from '../@interfaces/authContext';
-import { useLocalStorage } from './useLocalStorage';
+import React, { useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { authContextProps } from "../@interfaces/authContext";
+import { useLocalStorage } from "./useLocalStorage";
 export const Context = React.createContext<authContextProps | null>(null);
 
-const url = 'http://127.0.0.1:8000/api/';
+const url = "http://kamis-1.fesb.hr:8000/api/";
 
 const AuthContextProvider = ({ children }: any) => {
-  const [token, setToken] = useLocalStorage('token', null);
-  const [expiry, setExpiry] = useLocalStorage('expiry', null);
-  const [error, setError] = useState({ message: '' });
+  const [token, setToken] = useLocalStorage("token", null);
+  const [expiry, setExpiry] = useLocalStorage("expiry", null);
+  const [error, setError] = useState({ message: "" });
   const navigate = useNavigate();
 
   const login = async (username: string, password: string) => {
     try {
       const response = await fetch(`${url}login/`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
       });
@@ -27,14 +27,14 @@ const AuthContextProvider = ({ children }: any) => {
         setToken(data.token);
         setExpiry(data.expiry);
         setTimeout(() => {
-          navigate('/');
-          setError({ message: '' });
+          navigate("/");
+          setError({ message: "" });
         }, 200);
       } else {
-        throw new Error('Incorrect credentials');
+        throw new Error("Incorrect credentials");
       }
     } catch (error: any) {
-      console.log('error occured: ', error);
+      console.log("error occured: ", error);
       setError(error);
     }
   };
@@ -51,9 +51,9 @@ const AuthContextProvider = ({ children }: any) => {
   ) => {
     try {
       const response = await fetch(`${url}register/`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, email, password }),
       });
@@ -63,14 +63,14 @@ const AuthContextProvider = ({ children }: any) => {
         setToken(data.token);
         setExpiry(data.expiry);
         setTimeout(() => {
-          navigate('/');
-          setError({ message: '' });
+          navigate("/");
+          setError({ message: "" });
         }, 200);
       } else {
-        throw new Error('Incorrect credentials');
+        throw new Error("Incorrect credentials");
       }
     } catch (error: any) {
-      console.log('error occured: ', error);
+      console.log("error occured: ", error);
       setError(error);
     }
   };
