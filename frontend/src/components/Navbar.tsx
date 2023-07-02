@@ -42,7 +42,7 @@ function Navbar() {
         {!token && (
           <>
             <Link className="link push-right" to={'/home'}>
-              Home
+              Index
             </Link>
             <Link className="link" to="/register">
               Register

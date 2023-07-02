@@ -24,8 +24,8 @@ const AuthContextProvider = ({ children }: any) => {
       if (response.ok) {
         const data = await response.json();
         console.log(data);
-        setToken(data.token);
-        setExpiry(data.expiry);
+        setToken(data.token[0]);
+        setExpiry(data.token[1]);
         setTimeout(() => {
           navigate('/');
           setError({ message: '' });
@@ -60,14 +60,15 @@ const AuthContextProvider = ({ children }: any) => {
       if (response.ok) {
         const data = await response.json();
         console.log(data);
-        setToken(data.token);
-        setExpiry(data.expiry);
+        setToken(data.data[0]);
+        setExpiry(data.data[1]);
         setTimeout(() => {
           navigate('/');
           setError({ message: '' });
         }, 200);
       } else {
-        throw new Error('Incorrect credentials');
+        console.log(response);
+        throw new Error(response.statusText);
       }
     } catch (error: any) {
       console.log('error occured: ', error);

@@ -107,14 +107,6 @@ DATABASES = {
         'HOST': env("POSTGRES_HOST"),
         'PORT': env("POSTGRES_PORT"),
     }
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #     'NAME': "stribor",
-    #     'USER': "postgres",
-    #     'PASSWORD': "postgres",
-    #     'HOST': 'localhost',  # name of docker compose service
-    #     'PORT': 5432
-    # }
 }
 
 

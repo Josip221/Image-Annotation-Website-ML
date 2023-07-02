@@ -29,7 +29,7 @@ class RegisterAPI(generics.GenericAPIView):
         user = serializer.save()
         return Response({
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
-            "token": AuthToken.objects.create(user)[1]
+            "data": AuthToken.objects.create(user)[1]
         })
 
 
@@ -43,6 +43,9 @@ class LoginAPI(KnoxLoginView):
         login(request, user)
         return super(LoginAPI, self).post(request, format=None)
 
+
+class LogOutAPI(generics.GenericAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
 
 class ProtectedRoute(APIView):
     permission_classes = (permissions.IsAuthenticated,)
@@ -69,8 +72,6 @@ class Sequence(APIView):
             selected_files = [
                 file for file in file_list if file.startswith(base_filename)
             ]
-
-
         images = []
         
         for file in selected_files:
@@ -88,7 +89,8 @@ class Sequence(APIView):
             encoded_image = base64.b64encode(image_buffer.getvalue()).decode('utf-8')
             images.append({"imageName": imageName, "image": encoded_image})
 
-        return Response({"success": True, "data": {"sequenceName": seqName, "images": images}})
+        sorted_images = sorted(images, key=lambda x: x["imageName"])
+        return Response({"success": True, "data": {"sequenceName": seqName, "images": sorted_images}})
 
     def post(self, request):
 

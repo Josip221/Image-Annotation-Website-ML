@@ -16,19 +16,23 @@ const Wrapper = styled.div`
   .controls--box {
     display: flex;
     justify-content: end;
-    align-items: end;
+    align-items: start;
     flex-direction: column;
     .title1 {
     }
   }
   .controls {
-    align-items: end;
+    align-items: start;
     display: flex;
     justify-content: end;
     flex-direction: column;
     font-weight: 400;
     letter-spacing: 1px;
     line-height: 2em;
+  }
+
+  .button--box {
+    display: flex;
   }
 `;
 
@@ -53,8 +57,11 @@ function ControlPanel() {
   };
   return (
     <Wrapper>
-      <Button parentFunction={handleSubmit}>Submit</Button>
-      <Button parentFunction={handleNext}>Next Sequence</Button>
+      <div className="button--box">
+        <Button parentFunction={handleSubmit}>Submit</Button>
+        <Button parentFunction={handleNext}>Next Sequence</Button>
+      </div>
+
       <div className="controls--box">
         <h1>Controls:</h1>
         <div className="controls">

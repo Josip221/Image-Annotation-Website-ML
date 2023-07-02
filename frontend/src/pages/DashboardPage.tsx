@@ -26,6 +26,7 @@ const Wrapper = styled.div`
   justify-content: center;
   flex-direction: row;
   align-items: flex-start;
+  margin: 2em 4em;
 `;
 
 const ImageWrapper = styled.div`

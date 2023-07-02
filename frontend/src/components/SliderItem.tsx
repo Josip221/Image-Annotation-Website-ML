@@ -18,12 +18,9 @@ const Wrapper = styled.div`
     width: 100%;
     border-radius: 10px;
     background-color: whitesmoke;
-    box-shadow: inset 0 -1em 1em rgba(0, 0, 0, 0.1),
-      0 0 0 2px rgb(255, 255, 255), 0.3em 0.3em 1em rgba(0, 0, 0, 0.3);
   }
   .slider-item_active {
     border: 1px ${props => props.theme.colors.button} solid;
-    background-color: floralwhite;
   }
 
   .slider-photo {
