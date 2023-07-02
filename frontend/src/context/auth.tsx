@@ -4,7 +4,7 @@ import { authContextProps } from '../@interfaces/authContext';
 import { useLocalStorage } from './useLocalStorage';
 export const Context = React.createContext<authContextProps | null>(null);
 
-const url = 'http://127.0.0.1:8000/api/';
+const url = 'http://kamis-1.fesb.hr:8000/api/';
 
 const AuthContextProvider = ({ children }: any) => {
   const [token, setToken] = useLocalStorage('token', null);
