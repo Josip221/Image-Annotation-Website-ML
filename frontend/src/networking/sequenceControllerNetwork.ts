@@ -1,13 +1,13 @@
-import { Selection } from "../@interfaces/interfaces";
+import { Selection } from '../@interfaces/interfaces';
 
-const url = "http://kamis-1.fesb.hr:8000/api/";
+const url = 'http://localhost:8000/api/';
 
 export const fetchRandomSequence = async (token: string) => {
   try {
     const response = await fetch(`${url}sequence/`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Token ${token}`,
       },
     });
@@ -15,7 +15,7 @@ export const fetchRandomSequence = async (token: string) => {
     console.log(data);
     return data;
   } catch (error: any) {
-    console.log("error occured: ", error);
+    console.log('error occured: ', error);
   }
 };
 
@@ -26,9 +26,9 @@ export const sendMarkedSequence = async (
 ) => {
   try {
     const response = await fetch(`${url}sequence/`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Token ${token}`,
       },
       body: JSON.stringify({ selections, sequence_name }),
@@ -38,10 +38,10 @@ export const sendMarkedSequence = async (
       console.log(data);
     } else {
       console.log(selections, token, sequence_name);
-      throw new Error("wrong format");
+      throw new Error('wrong format');
     }
   } catch (error: any) {
-    console.log("error occured: ", error);
+    console.log('error occured: ', error);
   }
 };
 

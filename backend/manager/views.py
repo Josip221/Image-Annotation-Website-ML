@@ -14,6 +14,7 @@ from PIL import Image
 import environ
 import os
 import random
+from datetime import datetime, timedelta
 
 
 env = environ.Env()
@@ -29,7 +30,7 @@ class RegisterAPI(generics.GenericAPIView):
         user = serializer.save()
         return Response({
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
-            "data": AuthToken.objects.create(user)[1]
+            "data": [AuthToken.objects.create(user)[1], datetime.now() + timedelta(hours=10),]
         })
 
 
