@@ -10,10 +10,12 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import GlobalStyle from './globalStyles.js';
 import { theme } from './globalStyles.js';
 import { ThemeProvider } from 'styled-components';
+import AdminPage from './pages/AdminPage';
 import ContextProvider from './context/context';
 
 import ProtectedRoute from './components/ProtectedRoute';
 import AuthContextProvider from './context/auth';
+import UserPage from './pages/UserPage';
 
 const router = createBrowserRouter([
   {
@@ -40,6 +42,14 @@ const router = createBrowserRouter([
       {
         path: '/register',
         element: <RegisterPage />,
+      },
+      {
+        path: '/user',
+        element: (
+          <ProtectedRoute>
+            <UserPage />
+          </ProtectedRoute>
+        ),
       },
     ],
   },

@@ -9,7 +9,7 @@ def makeEmptyMask():
     cv2.imwrite('example.png', image)
 
 
-def makeMask(selections, index):
+def makeMask(selections, index, destination):
     # maskfile = '%s/mask_%05d-frame-%02d.png' % ("dir", 11, 1)
 
     image = np.zeros((1080, 1920, 3), dtype=np.uint8)

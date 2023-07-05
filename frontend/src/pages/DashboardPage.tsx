@@ -42,8 +42,6 @@ const ImageWrapper = styled.div`
 
     object-fit: contain;
     cursor: pointer;
-    box-shadow: inset 0 -3em 3em rgba(0, 0, 0, 0.1),
-      0 0 0 2px rgb(255, 255, 255), 0.3em 0.3em 1em rgba(0, 0, 0, 0.3);
   }
 
   .container-fullscreen {
@@ -102,7 +100,7 @@ function DashboardPage() {
     sequenceData,
   } = useContext(Context) as ContextProps;
 
-  const { token } = useAuth() as authContextProps;
+  const { token, setError, error } = useAuth() as authContextProps;
 
   const toggleFullscreen = () => setIsFullscreen(prevVal => !prevVal);
 
@@ -207,9 +205,14 @@ function DashboardPage() {
   );
 
   useEffect(() => {
-    console.log('fetching');
-    setImages(token);
-  }, []);
+    if (sequenceData.sequenceName === 'loading') {
+      setImages(token).then(result => {
+        if (result) setError({ message: '' });
+        else setError({ message: 'No more images to select' });
+      });
+    }
+    setCurrentImageIndex(0);
+  }, [sequenceData]);
 
   useEffect(() => {
     //console.log('fetch image sequence here');
@@ -372,7 +375,12 @@ function DashboardPage() {
           {!isFullscreen && <Slider sliderInfo={sequenceData.images} />}
         </>
       )}
-      {!sequenceData.images.length && <h1>Fetching images...</h1>}
+      {!sequenceData.images.length && (
+        <div>
+          <h1>Fetching images...</h1>
+          <div>{error.message}</div>
+        </div>
+      )}
     </Wrapper>
   );
 }

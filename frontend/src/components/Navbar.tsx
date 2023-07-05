@@ -4,6 +4,7 @@ import { useContext } from 'react';
 import { useAuth } from '../context/auth';
 import { Context } from '../context/context';
 import { ContextProps } from '../@interfaces/interfaces';
+import { authContextProps } from '../@interfaces/authContext';
 
 const NavBar = styled.div`
   display: flex;
@@ -33,7 +34,7 @@ const Wrapper = styled.div`
 `;
 
 function Navbar() {
-  const { token, logOut }: any = useAuth();
+  const { token, logOut, user } = useAuth() as authContextProps;
   const { sequenceData } = useContext(Context) as ContextProps;
   //console.log(token);
   return (
@@ -41,8 +42,8 @@ function Navbar() {
       <NavBar>
         {!token && (
           <>
-            <Link className="link push-right" to={'/home'}>
-              Index
+            <Link className="link push-right" to={'/'}>
+              Stribor
             </Link>
             <Link className="link" to="/register">
               Register
@@ -54,8 +55,11 @@ function Navbar() {
         )}
         {token && (
           <>
-            <Link className="link push-right" to={'/home'}>
+            <Link className="link push-right" to={'/'}>
               {sequenceData.sequenceName}
+            </Link>
+            <Link className="link " to={'/user'}>
+              {user.username}
             </Link>
             <Link onClick={() => logOut()} className="link" to="/login">
               Log out

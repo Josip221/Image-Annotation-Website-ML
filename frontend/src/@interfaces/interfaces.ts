@@ -10,12 +10,21 @@ export interface ContextProps {
   fullScreenWidth: number;
   setFullScreenWidth: React.Dispatch<React.SetStateAction<number>>;
   copyPreviousToCurrent: () => void;
-  setImages: (token: string) => void;
+  setImages: (token: string) => Promise<number>;
   sequenceData: {
     sequenceName: string;
     images: { imageName: string; image: string }[];
   };
   clearAll: () => void;
+  setSequenceData: React.Dispatch<
+    React.SetStateAction<{
+      sequenceName: string;
+      images: {
+        imageName: string;
+        image: string;
+      }[];
+    }>
+  >;
 }
 
 export interface Selection {

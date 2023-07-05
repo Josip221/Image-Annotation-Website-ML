@@ -7,6 +7,7 @@ import { sendMarkedSequence } from '../networking/sequenceControllerNetwork';
 import { useAuth } from '../context/auth';
 import { adjustToScale } from '../label_processing/label_processing';
 import { authContextProps } from '../@interfaces/authContext';
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -37,23 +38,24 @@ const Wrapper = styled.div`
 `;
 
 function ControlPanel() {
-  const { selections, fullImageRatioToOg, setImages, clearAll } = useContext(
+  const { selections, fullImageRatioToOg, clearAll, sequenceData } = useContext(
     Context
   ) as ContextProps;
 
-  const { token } = useAuth() as authContextProps;
+  const { token, user, error } = useAuth() as authContextProps;
 
   const handleSubmit = () => {
     sendMarkedSequence(
       adjustToScale(selections, fullImageRatioToOg),
+      sequenceData.sequenceName, //fix later
+      sequenceData.images[0].imageName,
       token,
-      'seq20221' //name of seqeunce folder, will fix
+      user
     );
   };
 
   const handleNext = () => {
     clearAll();
-    setImages(token);
   };
   return (
     <Wrapper>

@@ -1,6 +1,6 @@
 import { Selection } from '../@interfaces/interfaces';
 
-const url = 'http://localhost:8000/api/';
+const url = process.env.REACT_APP_API_URL;
 
 export const fetchRandomSequence = async (token: string) => {
   try {
@@ -21,8 +21,10 @@ export const fetchRandomSequence = async (token: string) => {
 
 export const sendMarkedSequence = async (
   selections: Selection[],
+  sequence_name: string,
+  frame_00: string,
   token: string,
-  sequence_name: string
+  user: { user_id: number; username: string }
 ) => {
   try {
     const response = await fetch(`${url}sequence/`, {
@@ -31,7 +33,7 @@ export const sendMarkedSequence = async (
         'Content-Type': 'application/json',
         Authorization: `Token ${token}`,
       },
-      body: JSON.stringify({ selections, sequence_name }),
+      body: JSON.stringify({ selections, sequence_name, user, frame_00 }),
     });
     if (response.ok) {
       const data = await response.json();
@@ -39,6 +41,30 @@ export const sendMarkedSequence = async (
     } else {
       console.log(selections, token, sequence_name);
       throw new Error('wrong format');
+    }
+  } catch (error: any) {
+    console.log('error occured: ', error);
+  }
+};
+
+export const getUserMarkedSequences = async (
+  token: string,
+  user: { user_id: number; username: string }
+) => {
+  try {
+    const response = await fetch(`${url}sequence/${user.user_id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Token ${token}`,
+      },
+      body: JSON.stringify({ user }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+    } else {
+      throw new Error('Error occured');
     }
   } catch (error: any) {
     console.log('error occured: ', error);

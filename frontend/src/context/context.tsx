@@ -73,21 +73,25 @@ const ContextProvider = ({ children }: any) => {
     }
   };
 
-  const setImages = async (token: string) => {
+  const setImages = async (token: string): Promise<number> => {
     const response = await fetchRandomSequence(token);
-
-    const base64Mod = response.data.images.map(
-      (item: { imageName: string; image: string }) => {
-        return {
-          imageName: item.imageName,
-          image: 'data:image/jpeg;base64,' + item.image,
-        };
-      }
-    );
-    setSequenceData({
-      sequenceName: response.data.sequenceName,
-      images: base64Mod,
-    });
+    if (response.data.images) {
+      const base64Mod = response.data.images.map(
+        (item: { imageName: string; image: string }) => {
+          return {
+            imageName: item.imageName,
+            image: 'data:image/jpeg;base64,' + item.image,
+          };
+        }
+      );
+      setSequenceData({
+        sequenceName: response.data.sequenceName,
+        images: base64Mod,
+      });
+      return 1;
+    } else {
+      return 0;
+    }
   };
 
   const clearAll = () => {
@@ -113,6 +117,7 @@ const ContextProvider = ({ children }: any) => {
         copyPreviousToCurrent,
         setImages,
         sequenceData,
+        setSequenceData,
         clearAll,
       }}
     >

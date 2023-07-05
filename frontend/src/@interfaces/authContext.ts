@@ -10,4 +10,5 @@ export interface authContextProps {
       message: string;
     }>
   >;
+  user: { user_id: number; username: string };
 }

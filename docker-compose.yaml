@@ -1,5 +1,4 @@
 version: '3'
-
 services:
   db:
     image: postgres
@@ -23,7 +22,7 @@ services:
     depends_on:
       - db
     volumes:
-      - ../UPLOAD-SEKVENCE:/UPLOAD-SEKVENCE
+      - ${DOCKER_VOLUME}
   react:
     build:
       context: ./frontend
@@ -41,6 +40,5 @@ services:
       - django
       - react
       - db
-
 volumes:
   db_data:
