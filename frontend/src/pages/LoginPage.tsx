@@ -15,6 +15,10 @@ const Wrapper = styled.div`
   .error {
     color: red;
   }
+
+  .link {
+    color: inherit;
+  }
 `;
 
 function LoginPage() {
@@ -51,7 +55,10 @@ function LoginPage() {
       />
       <Button parentFunction={onSubmit}>Log in</Button>
       <div>
-        Don't have an account? <Link to="/register">Register</Link>
+        Don't have an account?{' '}
+        <Link className="link" to="/register">
+          Register
+        </Link>
       </div>
       {error && <div className="error">{error.message}</div>}
     </Wrapper>

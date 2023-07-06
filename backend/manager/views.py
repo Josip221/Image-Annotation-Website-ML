@@ -21,7 +21,6 @@ from rest_framework.pagination import PageNumberPagination
 
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
-
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -32,10 +31,8 @@ class RegisterAPI(generics.GenericAPIView):
             "data": [AuthToken.objects.create(user)[1], datetime.now() + timedelta(hours=10),]
         })
 
-
 class LoginAPI(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
-
     def post(self, request, format=None):
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

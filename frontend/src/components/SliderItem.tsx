@@ -18,7 +18,7 @@ const Wrapper = styled.div`
     gap: 2em;
     width: 100%;
     border-radius: 10px;
-    background-color: whitesmoke;
+    background-color: transparent;
   }
   .slider-item_active {
     border: 1px ${props => props.theme.colors.button} solid;
@@ -59,12 +59,8 @@ function SliderItem({ active = false, img, name, index }: SliderItemProps) {
         width: rect.width,
         height: rect.height,
       });
-      console.log(
-        1 / +(1300 / imageRef.current.width),
-        fullScreenWidth,
-        imageRef.current.width
-      );
-      setScale(1 / +(1300 / imageRef.current.width).toFixed(1));
+
+      setScale(1 / +(fullScreenWidth / imageRef.current.width).toFixed(1));
     }
   }, [fullScreenWidth, img]);
 

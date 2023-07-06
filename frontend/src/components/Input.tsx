@@ -4,6 +4,14 @@ import styled from 'styled-components';
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
+  width: 300px;
+
+  margin: 0.5em;
+  gap: 0.5em;
+  .input {
+    padding: 0.2em;
+    border-color: ${props => props.theme.colors.second};
+  }
 `;
 
 interface InputProps {
@@ -23,6 +31,7 @@ function Input({ label, type, placeholder, parentFunction }: InputProps) {
     <Wrapper>
       <label>{label}</label>
       <input
+        className="input"
         type={type}
         ref={inputRef}
         placeholder={placeholder}

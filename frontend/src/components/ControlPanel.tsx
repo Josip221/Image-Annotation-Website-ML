@@ -31,6 +31,9 @@ const Wrapper = styled.div`
     letter-spacing: 1px;
     line-height: 2em;
   }
+  h1 {
+    font-family: 'Roboto Slab', serif;
+  }
 
   .button--box {
     display: flex;

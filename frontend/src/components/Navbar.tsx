@@ -15,7 +15,9 @@ const NavBar = styled.div`
   border-bottom: 2px solid ${props => props.theme.colors.second};
 
   .link {
-    font-size: 1rem;
+    font-family: 'Roboto Slab', serif;
+    font-size: 2rem;
+    font-weight: bold;
     text-decoration: none;
     color: ${props => props.theme.colors.text};
   }

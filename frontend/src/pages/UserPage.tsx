@@ -52,7 +52,6 @@ function UserPage() {
       page = ''
     ) => {
       const response = await getUserMarkedSequences(token, user, page);
-      console.log(response);
       const nextLink = response.next;
       const prevLink = response.previous;
       setLinks({ prevLink, nextLink });
