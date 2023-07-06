@@ -49,6 +49,7 @@ const ImageWrapper = styled.div`
     display: flex;
     justify-content: center;
     overflow: hidden;
+
     align-items: center;
     top: 0;
     left: 0;
@@ -69,6 +70,7 @@ const ImageWrapper = styled.div`
     position: absolute;
     cursor: crosshair;
     z-index: 10;
+    background-color: transparent;
   }
 `;
 
@@ -232,7 +234,7 @@ function DashboardPage() {
       //ratio
       const nwidth = imageRef.current?.naturalWidth;
       const width = imageRef.current?.width;
-      setFullScreenWidth(width);
+      //setFullScreenWidth(width);
       if (nwidth && width) setFullImageRatioToOg(+(nwidth / width).toFixed(2));
     }
     if (!isFullscreen && imageRef.current && fullScreenWidth !== 0) {
@@ -301,7 +303,6 @@ function DashboardPage() {
                       return { ...prev, x: values.x, y: values.y };
                     });
                   }}
-                  //panning={{ activationKeys: ['Alt', 'Space'] }}
                   onZoomStop={(ref, e) => {
                     let values = {
                       x: 0,

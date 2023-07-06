@@ -7,15 +7,6 @@ import { useParams } from 'react-router-dom';
 import { getUserMarkedSequences } from '../networking/sequenceControllerNetwork';
 import Button from '../components/Button';
 
-const options = {
-  hour: 'numeric',
-  minute: 'numeric',
-  hour12: true,
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-};
-
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -29,6 +20,11 @@ const Wrapper = styled.div`
     margin: 4em;
 
     gap: 0.5em;
+  }
+
+  .buttons {
+    display: flex;
+    flex-direction: row;
   }
 
   .link {
@@ -46,21 +42,38 @@ const Wrapper = styled.div`
 function UserPage() {
   const { token, user } = useAuth() as authContextProps;
   const { username } = useParams();
-  const [links, setLinks] = useState({ prevLink: null, nextLink: null });
+  const [links, setLinks] = useState({ prevLink: '', nextLink: '' });
   const [items, setItems] = useState([]);
 
   const fetchUserMarkedSequences = useCallback(
-    async (token: string, user: { user_id: number; username: string }) => {
-      const response = await getUserMarkedSequences(token, user);
+    async (
+      token: string,
+      user: { user_id: number; username: string },
+      page = ''
+    ) => {
+      const response = await getUserMarkedSequences(token, user, page);
+      console.log(response);
       const nextLink = response.next;
-      const prevLink = response.prev;
+      const prevLink = response.previous;
       setLinks({ prevLink, nextLink });
       const data = response.results;
-
       setItems(data);
     },
     []
   );
+  const nextButtonClick = () => {
+    const pageIndex = links.nextLink.split('?page=')[1];
+    console.log(pageIndex);
+    fetchUserMarkedSequences(token, user, `?page=${pageIndex}`);
+  };
+  const prevButtonClick = () => {
+    const pageIndex = links.prevLink.split('?page=')[1];
+    if (pageIndex) {
+      fetchUserMarkedSequences(token, user, `?page=${pageIndex}`);
+    } else {
+      fetchUserMarkedSequences(token, user);
+    }
+  };
 
   useEffect(() => {
     fetchUserMarkedSequences(token, user);
@@ -71,7 +84,6 @@ function UserPage() {
       User: {user.username}
       <div className="links">
         {items.map((item, i: number) => {
-          console.log(item);
           const { id, sequence_name, reviewed_at, frame_00 } = item;
           const frame: string = frame_00;
           const dateTimeObj = new Date(reviewed_at);
@@ -93,6 +105,14 @@ function UserPage() {
             </Link>
           );
         })}
+      </div>
+      <div className="buttons">
+        {links.prevLink && (
+          <Button parentFunction={prevButtonClick}>Prev</Button>
+        )}
+        {links.nextLink && (
+          <Button parentFunction={nextButtonClick}>Next</Button>
+        )}
       </div>
     </Wrapper>
   );

@@ -69,10 +69,11 @@ export const sendMarkedSequence = async (
 
 export const getUserMarkedSequences = async (
   token: string,
-  user: { user_id: number; username: string }
+  user: { user_id: number; username: string },
+  page: string
 ) => {
   try {
-    const response = await fetch(`${url}sequence/${user.username}`, {
+    const response = await fetch(`${url}sequence/${user.username}${page}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

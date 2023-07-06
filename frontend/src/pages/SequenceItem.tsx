@@ -10,15 +10,7 @@ import { Context } from '../context/context';
 import { ContextProps } from '../@interfaces/interfaces';
 import Slider from '../components/Slider';
 import styled from 'styled-components';
-
-const options = {
-  hour: 'numeric',
-  minute: 'numeric',
-  hour12: true,
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-};
+import { adjustToScale } from '../label_processing/label_processing';
 
 const Wrapper = styled.div`
   margin: 2em;
@@ -37,9 +29,13 @@ const Wrapper = styled.div`
 function SequenceItem() {
   const { id } = useParams();
   const { token } = useAuth() as authContextProps;
-  const { setCurrentImageIndex, setSelections, setFullScreenWidth } =
-    useContext(Context) as ContextProps;
-  const [date, setDate] = useState(new Date());
+  const {
+    setCurrentImageIndex,
+    setSelections,
+    setFullScreenWidth,
+    fullImageRatioToOg,
+  } = useContext(Context) as ContextProps;
+  const [date, setDate] = useState('');
   const [sequenceData, setSequenceData] = useState<{
     sequenceName: string;
 
@@ -61,8 +57,18 @@ function SequenceItem() {
         frame_00
       );
       const time = new Date(imagesResponse.data.selection.reviewed_at);
-      console.log(time);
-      setDate(time);
+      const dateTimeObj = new Date(time);
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true,
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+      const formattedDateTime = formatter.format(dateTimeObj);
+
+      setDate(formattedDateTime);
       const base64Mod = imagesResponse.data.images.map(
         (item: { imageName: string; image: string }, i: number) => {
           const numString = i.toString();
@@ -75,7 +81,7 @@ function SequenceItem() {
         }
       );
       const selections = response.results[0].selections;
-      setSelections(selections);
+      setSelections(adjustToScale(selections, 1 / fullImageRatioToOg));
       setSequenceData({
         sequenceName: imagesResponse.data.sequenceName,
         images: base64Mod,
@@ -104,8 +110,7 @@ function SequenceItem() {
     <Wrapper>
       <div className="item__info">
         <span> Sequence id : {id}</span>
-        {/* <span>Marked by user: {user}</span> */}
-        <span>Marked: {date.toISOString()}</span>
+        <span>Marked: {date}</span>
       </div>
 
       <Slider sliderInfo={sequenceData.images} />

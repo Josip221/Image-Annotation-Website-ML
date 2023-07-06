@@ -12,10 +12,12 @@ import { adjustToScale } from '../label_processing/label_processing';
 const Wrapper = styled.div`
   position: absolute;
   pointer-events: none;
+  background-color: transparent;
   svg {
     position: absolute;
     height: 100%;
     width: 100%;
+    background-color: transparent;
   }
 `;
 

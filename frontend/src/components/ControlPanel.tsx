@@ -53,6 +53,7 @@ function ControlPanel() {
       user,
       sequenceData
     );
+    clearAll();
   };
 
   const handleNext = () => {
@@ -61,7 +62,7 @@ function ControlPanel() {
   return (
     <Wrapper>
       <div className="button--box">
-        <Button parentFunction={handleSubmit}>Submit</Button>
+        <Button parentFunction={handleSubmit}>Submit & Next Sequence</Button>
         <Button parentFunction={handleNext}>Next Sequence</Button>
       </div>
 

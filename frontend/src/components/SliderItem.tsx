@@ -59,8 +59,12 @@ function SliderItem({ active = false, img, name, index }: SliderItemProps) {
         width: rect.width,
         height: rect.height,
       });
-
-      setScale(1 / +(fullScreenWidth / imageRef.current.width).toFixed(1));
+      console.log(
+        1 / +(1300 / imageRef.current.width),
+        fullScreenWidth,
+        imageRef.current.width
+      );
+      setScale(1 / +(1300 / imageRef.current.width).toFixed(1));
     }
   }, [fullScreenWidth, img]);
 
@@ -70,7 +74,7 @@ function SliderItem({ active = false, img, name, index }: SliderItemProps) {
         <img ref={imageRef} className="slider-photo" alt="idk" src={img} />
         <Canvas
           rect={{
-            top: 1,
+            top: 2,
             left: 2,
             width: rect.width,
             height: rect.height,

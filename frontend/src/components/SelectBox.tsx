@@ -9,6 +9,7 @@ interface Props {
 const Wrapper = styled.div<any>`
   position: absolute;
   border: 2px ${props => (props.type === 'draw' ? 'dashed red' : 'dashed blue')};
+  background-color: transparent;
 `;
 
 function SelectBox({ startCoords, endCoords, type, rect }: Props) {
