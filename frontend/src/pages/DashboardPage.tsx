@@ -98,6 +98,7 @@ function DashboardPage() {
     copyPreviousToCurrent,
     setImages,
     sequenceData,
+    setSelections,
   } = useContext(Context) as ContextProps;
 
   const { token, setError, error } = useAuth() as authContextProps;
@@ -205,6 +206,7 @@ function DashboardPage() {
   );
 
   useEffect(() => {
+    setSelections([]);
     if (sequenceData.sequenceName === 'loading') {
       setImages(token).then(result => {
         if (result) setError({ message: '' });

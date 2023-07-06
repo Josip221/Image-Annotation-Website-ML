@@ -42,7 +42,7 @@ function ControlPanel() {
     Context
   ) as ContextProps;
 
-  const { token, user, error } = useAuth() as authContextProps;
+  const { token, user } = useAuth() as authContextProps;
 
   const handleSubmit = () => {
     sendMarkedSequence(
@@ -50,7 +50,8 @@ function ControlPanel() {
       sequenceData.sequenceName, //fix later
       sequenceData.images[0].imageName,
       token,
-      user
+      user,
+      sequenceData
     );
   };
 

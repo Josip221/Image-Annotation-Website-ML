@@ -12,16 +12,11 @@ from .models import User, ReviewedSequence as ReviewedSequenceModel
 import io
 import base64
 from PIL import Image
-import environ
-import json
 import os
 import random
 from datetime import datetime, timedelta
-from rest_framework.renderers import JSONRenderer
+from rest_framework.pagination import PageNumberPagination
 
-
-env = environ.Env()
-environ.Env.read_env()
 
 
 class RegisterAPI(generics.GenericAPIView):
@@ -65,24 +60,65 @@ class ReviewedSequence(APIView):
 
     def get(self, request):
         return Response({"success": True})
+    
+class SequencePagination(PageNumberPagination):
+    page_size = 5
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 class Sequence(APIView):
     # must be logged in
     permission_classes = (permissions.IsAuthenticated,)
 
-    def get(self, request, pk=None, user=None, *args, **kwargs):
+    def get(self, request, pk=None, user=None, paramSeq = None, paramImg = None,*args, **kwargs):
         id = pk or request.query_params.get('id')
         user = user or request.query_params.get('user')
+        paramSeq = paramSeq or request.query_params.get('paramSeq')
+        paramImg = paramImg or request.query_params.get('paramImg')
         if id:
-            data = ReviewedSequenceModel.objects.filter(id=id)
-            serializer = ReviewedSequenceSerializer(data, many=True)
-            byteStringData = JSONRenderer().render(serializer.data)
-            fix_bytes_value = byteStringData.replace(b"'", b'"')
-            json_data = json.load(io.BytesIO(fix_bytes_value))  
-            return Response({"success": True, "data": json_data})
+            data = ReviewedSequenceModel.objects.filter(id = id)
+            paginator = SequencePagination()
+            user = User.objects.filter(id=list(data.values("user"))[0]["user"])
+            username = user.values("username")[0]["username"]
+            
+            print(data.values("user"))
+            paginated_data = paginator.paginate_queryset(data, request)
+            serializer = ReviewedSequenceSerializer(paginated_data, many=True)
+   
+            return paginator.get_paginated_response(serializer.data)
         elif user:
-            print(user)
-            return Response({"success": True})
+            data = ReviewedSequenceModel.objects.filter(user__username=user)
+            paginator = SequencePagination()
+            paginated_data = paginator.paginate_queryset(data, request)
+            serializer = ReviewedSequenceSerializer(paginated_data, many=True)
+            return paginator.get_paginated_response(serializer.data)
+        elif paramSeq and paramImg:
+
+            data = ReviewedSequenceModel.objects.filter(sequence_name=paramSeq, frame_00=f"{paramImg}-frame-00")
+            if not data:
+                  return Response({"success": False, "message": "Doesn't exist"})
+            sequence = list(data.values())[0]
+            amountOfFrames = list(data.values("length"))[0]["length"]
+            images = []
+
+            for i in range(amountOfFrames):
+                if i < 10:
+                    zfill = str(i).zfill(2)
+                else:
+                    zfill = i
+                file_path = f"../UPLOAD-SEKVENCE/NEOZNACENE/{paramSeq}/{paramImg}-frame-{zfill}.jpg"
+                if os.path.isfile(file_path):
+                    with open(file_path, 'rb') as file:
+                        image_data = file.read()
+                            
+                image = Image.open(io.BytesIO(image_data))
+                image_buffer = io.BytesIO()
+                image.save(image_buffer, format='JPEG')
+                image_buffer.seek(0)
+                encoded_image = base64.b64encode(image_buffer.getvalue()).decode('utf-8')
+                images.append({"imageName": paramImg, "image": encoded_image})
+            finalImages = sorted(images, key=lambda x: x["imageName"])
+            return Response({"success": True, "data": {"sequenceName": paramSeq, "images": finalImages, "selection": sequence}})
         else:
             finalSequenceName = None
             finalImages = None
@@ -133,12 +169,13 @@ class Sequence(APIView):
 
     def post(self, request):
 
-      
+    
         sequence_name = request.data["sequence_name"]
         frame_00 = request.data["frame_00"]
+        
         selections = request.data["selections"]
         allSelectionsInAnImage = dict()
-        # destructuring the selection object
+
         for selection in selections:
             image_id = selection['imageId']
             edges = selection["selection"]["edges"]
@@ -148,7 +185,7 @@ class Sequence(APIView):
                 allSelectionsInAnImage[image_id] = []
                 allSelectionsInAnImage[image_id].append(edges)
         for index in allSelectionsInAnImage:
-            makeMask(allSelectionsInAnImage[index], index, "dest")
+            makeMask(allSelectionsInAnImage[index], index, sequence_name, frame_00)
 
 
         user = User.objects.get(id=request.data["user"]["user_id"])

@@ -10,12 +10,12 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import GlobalStyle from './globalStyles.js';
 import { theme } from './globalStyles.js';
 import { ThemeProvider } from 'styled-components';
-import AdminPage from './pages/AdminPage';
 import ContextProvider from './context/context';
 
 import ProtectedRoute from './components/ProtectedRoute';
 import AuthContextProvider from './context/auth';
 import UserPage from './pages/UserPage';
+import SequenceItem from './pages/SequenceItem';
 
 const router = createBrowserRouter([
   {
@@ -44,10 +44,18 @@ const router = createBrowserRouter([
         element: <RegisterPage />,
       },
       {
-        path: '/user',
+        path: '/user/:username',
         element: (
           <ProtectedRoute>
             <UserPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/sequence/:id',
+        element: (
+          <ProtectedRoute>
+            <SequenceItem />
           </ProtectedRoute>
         ),
       },

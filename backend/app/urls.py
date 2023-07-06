@@ -10,6 +10,7 @@ urlpatterns = [
     path('api/login/', LoginAPI.as_view(), name='login'),
     path('api/logout/', knox_views.LogoutView.as_view(), name='logout'),
     path("api/protected/", ProtectedRoute.as_view()),
+    path("api/sequence/<str:paramSeq>/<str:paramImg>", Sequence.as_view()),
     path("api/sequence/<int:pk>", Sequence.as_view()),
     path("api/sequence/<str:user>", Sequence.as_view()),
     path("api/sequence/", Sequence.as_view())

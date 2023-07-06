@@ -9,12 +9,10 @@ import { authContextProps } from '../@interfaces/authContext';
 const NavBar = styled.div`
   display: flex;
   align-items: center;
-  width: 100%;
   padding: 1em;
-  background-color: ${props => props.theme.colors.second};
+  background-color: ${props => props.theme.colors.first};
   gap: 1em;
-  box-shadow: inset 0 -3em 3em rgba(0, 0, 0, 0.1), 0 0 0 2px rgb(255, 255, 255),
-    0.3em 0.3em 1em rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid ${props => props.theme.colors.second};
 
   .link {
     font-size: 1rem;
@@ -56,9 +54,11 @@ function Navbar() {
         {token && (
           <>
             <Link className="link push-right" to={'/'}>
-              {sequenceData.sequenceName}
+              {sequenceData.sequenceName !== 'loading'
+                ? sequenceData.sequenceName
+                : 'Home'}
             </Link>
-            <Link className="link " to={'/user'}>
+            <Link className="link " to={`/user/${user.username}`}>
               {user.username}
             </Link>
             <Link onClick={() => logOut()} className="link" to="/login">

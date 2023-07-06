@@ -36,11 +36,14 @@ const Canvas = ({
   );
 
   useEffect(() => {
-    const adjustedSelections = adjustToScale(
-      selections.filter((el: Selection) => el.imageId === index),
-      scale
-    );
-    setCurrentSelections(adjustedSelections);
+    //console.log(selections);
+    if (scale !== Infinity) {
+      const adjustedSelections = adjustToScale(
+        selections.filter((el: Selection) => el.imageId === index),
+        scale
+      );
+      setCurrentSelections(adjustedSelections);
+    }
   }, [setCurrentSelections, selections, index, scale]);
 
   return (
@@ -54,6 +57,10 @@ const Canvas = ({
     >
       {currentSelections &&
         currentSelections.map((item: Selection, i: number) => {
+          if (item.selection.edges.length === 0) {
+            return <span key={i}></span>;
+          }
+
           return (
             <svg key={i}>
               {item.selection.edges.map((edge: Edge, i: number) => {

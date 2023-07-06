@@ -9,21 +9,30 @@ def makeEmptyMask():
     cv2.imwrite('example.png', image)
 
 
-def makeMask(selections, index, destination):
-    # maskfile = '%s/mask_%05d-frame-%02d.png' % ("dir", 11, 1)
+def makeMask(selections, index, sequence_name, frame_00):
 
+
+    seqNameNumber = frame_00.split("_")[1].split("-")[0]
+
+    if index < 10:
+        zfill = str(index).zfill(2)
+    else:
+        zfill = index
     image = np.zeros((1080, 1920, 3), dtype=np.uint8)
-
     for selection in selections:
-        onlyFirstPositionsOfEdges = []
-        for edge in selection:
-            onlyFirstPositionsOfEdges.append(edge[0])
+        if selection == []:
+            image = np.zeros((1080, 1920, 3), dtype=np.uint8)
+        else:
+            onlyFirstPositionsOfEdges = []
+            for edge in selection:
+                onlyFirstPositionsOfEdges.append(edge[0])
 
-        pts = np.array(onlyFirstPositionsOfEdges, np.int32)
-        pts = pts.reshape((-1, 1, 2))
-        cv2.fillPoly(image, [pts],  (255, 255, 255))
+            pts = np.array(onlyFirstPositionsOfEdges, np.int32)
+            pts = pts.reshape((-1, 1, 2))
+            cv2.fillPoly(image, [pts],  (255, 255, 255))
 
-    cv2.imwrite(f"images/test{index}.png", image)
+    #adjut for prod
+    cv2.imwrite(f"../UPLOAD-SEKVENCE/NEOZNACENE/{sequence_name}/mask_{seqNameNumber}-frame-{zfill}.png", image)
 
 
 def savePng(maskfile, image):

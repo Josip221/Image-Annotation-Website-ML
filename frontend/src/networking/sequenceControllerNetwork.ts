@@ -24,8 +24,24 @@ export const sendMarkedSequence = async (
   sequence_name: string,
   frame_00: string,
   token: string,
-  user: { user_id: number; username: string }
+  user: { user_id: number; username: string },
+  images: {
+    sequenceName: string;
+    images: { imageName: string; image: string }[];
+  }
 ) => {
+  for (let i = 0; i < images.images.length; i++) {
+    let mark = 0;
+    selections.forEach((item: Selection) => {
+      if (item.imageId === i) mark++;
+    });
+    if (!mark)
+      selections.splice(i, 0, {
+        imageId: i,
+        selection: { selectionId: 0, edges: [] },
+      });
+  }
+
   try {
     const response = await fetch(`${url}sequence/`, {
       method: 'POST',
@@ -33,13 +49,17 @@ export const sendMarkedSequence = async (
         'Content-Type': 'application/json',
         Authorization: `Token ${token}`,
       },
-      body: JSON.stringify({ selections, sequence_name, user, frame_00 }),
+      body: JSON.stringify({
+        selections,
+        sequence_name,
+        user,
+        frame_00,
+        length: images.images.length,
+      }),
     });
     if (response.ok) {
-      const data = await response.json();
-      console.log(data);
+      //const data = await response.json();
     } else {
-      console.log(selections, token, sequence_name);
       throw new Error('wrong format');
     }
   } catch (error: any) {
@@ -52,17 +72,61 @@ export const getUserMarkedSequences = async (
   user: { user_id: number; username: string }
 ) => {
   try {
-    const response = await fetch(`${url}sequence/${user.user_id}`, {
+    const response = await fetch(`${url}sequence/${user.username}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Token ${token}`,
       },
-      body: JSON.stringify({ user }),
     });
     if (response.ok) {
       const data = await response.json();
-      console.log(data);
+      return data;
+    } else {
+      throw new Error('Error occured');
+    }
+  } catch (error: any) {
+    console.log('error occured: ', error);
+  }
+};
+
+export const getSequenceById = async (token: string, sequenceId: number) => {
+  try {
+    const response = await fetch(`${url}sequence/${sequenceId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Token ${token}`,
+      },
+    });
+    if (response.ok) {
+      const data = await response.json();
+
+      return data;
+    } else {
+      throw new Error('Error occured');
+    }
+  } catch (error: any) {
+    console.log('error occured: ', error);
+  }
+};
+
+export const getSequenceImagesByNameAndFrame = async (
+  token: string,
+  seqName: string,
+  frame_00: string
+) => {
+  try {
+    const response = await fetch(`${url}sequence/${seqName}/${frame_00}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Token ${token}`,
+      },
+    });
+    if (response.ok) {
+      const data = await response.json();
+      return data;
     } else {
       throw new Error('Error occured');
     }

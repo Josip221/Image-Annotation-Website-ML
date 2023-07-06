@@ -25,6 +25,7 @@ export interface ContextProps {
       }[];
     }>
   >;
+  setSelections: React.Dispatch<React.SetStateAction<Selection[]>>;
 }
 
 export interface Selection {

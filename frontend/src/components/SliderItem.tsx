@@ -15,6 +15,7 @@ const Wrapper = styled.div`
     }
     box-sizing: border-box;
     padding: 0.1em;
+    gap: 2em;
     width: 100%;
     border-radius: 10px;
     background-color: whitesmoke;
@@ -25,8 +26,7 @@ const Wrapper = styled.div`
 
   .slider-photo {
     border-radius: 10px;
-    width: 150px;
-    height: 80px;
+    width: 300px;
     vertical-align: top;
     object-fit: 'contain';
     object-position: top;
@@ -59,6 +59,7 @@ function SliderItem({ active = false, img, name, index }: SliderItemProps) {
         width: rect.width,
         height: rect.height,
       });
+
       setScale(1 / +(fullScreenWidth / imageRef.current.width).toFixed(1));
     }
   }, [fullScreenWidth, img]);

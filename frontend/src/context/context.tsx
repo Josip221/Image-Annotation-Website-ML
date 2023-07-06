@@ -104,6 +104,7 @@ const ContextProvider = ({ children }: any) => {
   return (
     <Context.Provider
       value={{
+        setSelections,
         selections,
         addNewSelection,
         currentImageIndex,

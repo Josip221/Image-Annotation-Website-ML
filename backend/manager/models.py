@@ -17,7 +17,7 @@ class ReviewedSequence(models.Model):
     frame_00 = models.CharField(max_length=100)
     selections = models.JSONField()
     reviewed_at = models.DateTimeField(auto_now_add=True)
-
+    length = models.IntegerField()
 
 
     def __str__(self):
